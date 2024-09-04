@@ -2,7 +2,8 @@
 
 # 域名后缀匹配
 DOMAIN-SUFFIX,qichiyu.com
-
+DOMAIN-SUFFIX,v2rayssr.com
+DOMAIN-SUFFIX,blogspot.com
 # 域名关键字匹配
 DOMAIN-KEYWORD,1e100
 
