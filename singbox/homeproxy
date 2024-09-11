@@ -329,6 +329,7 @@ config node 'node_4545646'
 	list order 'node_1111'
 	list order 'node_1233'
 	list order 'node_4546'
+	list order 'node_11'
 
 config node 'node_1233'
 	option label '🐸 手动切换'
