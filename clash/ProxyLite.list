@@ -5,6 +5,8 @@ DOMAIN-SUFFIX,qichiyu.com
 DOMAIN-SUFFIX,v2rayssr.com
 DOMAIN-SUFFIX,blogspot.com
 DOMAIN-SUFFIX,bulianglin.com
+DOMAIN-SUFFIX,fast.com
+
 # 域名关键字匹配
 DOMAIN-KEYWORD,1e100
 
