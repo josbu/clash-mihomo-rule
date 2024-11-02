@@ -8,6 +8,7 @@ DOMAIN-SUFFIX,hao123.com
 DOMAIN-SUFFIX,douyin.com
 DOMAIN-SUFFIX,test-ipv6.com
 DOMAIN-SUFFIX,cloudflare.com
+DOMAIN-SUFFIX,beek.us.kg
 # 域名关键字匹配
 DOMAIN-KEYWORD,baidu
 
