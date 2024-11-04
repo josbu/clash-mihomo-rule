@@ -213,7 +213,7 @@ proxy-groups:
 rule-providers: 
   fix-direct:
     <<: *ClassicalText
-    url: https://mirror.ghproxy.com/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
+    url: https://mirror.ghproxy.com/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/Direct.list
   speedtest:
     <<: *ClassicalText
     url: https://mirror.ghproxy.com/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.list 
