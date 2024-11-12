@@ -1,9 +1,11 @@
+# 域名匹配
 DOMAIN-SUFFIX,6bcloud.top
 DOMAIN-SUFFIX,viptwo.top
 DOMAIN-SUFFIX,followme.com
 DOMAIN-SUFFIX,followme.ceo
 DOMAIN-SUFFIX,whatsmydns.me
 DOMAIN-SUFFIX,onlinejobs.ph
+DOMAIN-SUFFIX,v2rayssr.com
 
 # IP段匹配
 IP-CIDR,142.171.133.131/32,no-resolve
