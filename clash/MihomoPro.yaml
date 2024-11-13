@@ -382,6 +382,7 @@ rules:
   - RULE-SET,category-social-media-!cn,社交平台
   - RULE-SET,cn_domain,国内网站
   - RULE-SET,geolocation-!cn,国外网站
+  # 将 DOMAIN-REGEX 放到最后
   - DOMAIN-REGEX,^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$,漏网之鱼
   # IP路由
   - RULE-SET,facebook_ip,脸书服务,no-resolve
