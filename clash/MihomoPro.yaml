@@ -144,6 +144,7 @@ proxies:
 proxy-groups:
   - {name: 默认代理, <<: *SelectFB, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
   - {name: 故障转移, <<: *FallBack, proxies: [香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 冷门自选, 全球手动, 直连], icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ULB.png}
+  - {name: Proxyme, <<: *SelectProxy, icon: https://ghp.ci/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/Linkeless.png}
   - {name: 漏网之鱼, type: select, proxies: [默认代理, 直连], icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}
   - {name: 全球手动, type: select, include-all: true, filter: *FilterAll, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse.png}
   - {name: 冷门自选, type: select, include-all: true, filter: *FilterOther, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Orz-3/mini/master/Color/XD.png}
@@ -151,7 +152,6 @@ proxy-groups:
   - {name: AI平台, <<: *SelectSG, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Bot.png}
   - {name: Emby, <<: *SelectProxy, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Emby.png}
   - {name: YouTube, <<: *SelectProxy, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/youtube.png}
-  - {name: Proxyme, <<: *SelectProxy, icon: https://ghp.ci/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/Linkeless.png}
   - {name: NetFlix, <<: *SelectProxy, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png}
   - {name: TikTok, <<: *SelectProxy, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok.png}
   - {name: Disney, <<: *SelectProxy, icon: https://mirror.ghproxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Disney.png}
