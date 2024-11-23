@@ -9,6 +9,8 @@ DOMAIN-SUFFIX,douyin.com
 DOMAIN-SUFFIX,test-ipv6.com
 DOMAIN-SUFFIX,cloudflare.com
 DOMAIN-SUFFIX,us.kg
+DOMAIN-SUFFIX,windows.com
+DOMAIN-SUFFIX,nist.gov
 
 # 域名关键字匹配
 DOMAIN-KEYWORD,baidu
