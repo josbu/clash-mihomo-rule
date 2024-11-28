@@ -173,6 +173,7 @@ proxies:
 # 策略组 
 proxy-groups:
   - {name: 默认代理, <<: *SelectFB, icon: https://ghp.ci/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
+  - {name: Proxyme, <<: *SelectProxy, icon: https://ghp.ci/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/Linkeless.png}
   - {name: 故障转移, <<: *FallBack, proxies: [香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 全球手动, 冷门自选, 直连], icon: https://ghp.ci/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ULB.png}
   - {name: 漏网之鱼, type: select, proxies: [默认代理, 直连], icon: https://ghp.ci/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}
   - {name: 全球手动, type: select, include-all: true, filter: *FilterAll, icon: https://ghp.ci/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse.png}
@@ -247,6 +248,9 @@ rule-providers:
   fix-direct:
     <<: *ClassicalText
     url: https://ghp.ci/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/Direct.list
+  proxyme:
+    <<: *ClassicalText
+    url: https://mirror.ghproxy.com/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list   
   speedtest:
     <<: *ClassicalText
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.list 
@@ -391,6 +395,7 @@ rules:
   - DOMAIN-SUFFIX,edith.xiaohongshu.com,抖快书定位
   # 域名路由
   - RULE-SET,fix-direct,直连
+  - RULE-SET,proxyme,Proxyme  
   - RULE-SET,XPTV,直连
   - RULE-SET,private_ip,国内网站,no-resolve
   - RULE-SET,speedtest,网速测试
