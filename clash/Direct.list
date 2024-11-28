@@ -11,8 +11,7 @@ DOMAIN-SUFFIX,cloudflare.com
 DOMAIN-SUFFIX,us.kg
 DOMAIN-SUFFIX,windows.com
 DOMAIN-SUFFIX,nist.gov
-DOMAIN-SUFFIX,youku.com
-DOMAIN-SUFFIX,iqiyi.com
+
 
 # 域名关键字匹配
 DOMAIN-KEYWORD,baidu
