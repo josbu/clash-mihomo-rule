@@ -256,7 +256,7 @@ rule-providers:
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/emby.list   
   openai:
     <<: *DomainMrs
-    url: https://ghp.ci/raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/AI.list
+    url: https://ghp.ci/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/AI.list
   telegram:
     <<: *DomainMrs
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/telegram.mrs
