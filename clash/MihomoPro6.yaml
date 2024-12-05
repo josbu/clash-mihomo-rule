@@ -247,7 +247,7 @@ rule-providers:
     url: https://ghp.ci/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/Direct.list
   proxyme:
     <<: *ClassicalText
-    url: https://mirror.ghproxy.com/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list       
+    url: https://ghp.ci/raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list       
   speedtest:
     <<: *ClassicalYaml
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.yaml 
@@ -256,7 +256,7 @@ rule-providers:
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/emby.list   
   openai:
     <<: *DomainMrs
-    url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/openai.mrs
+    url: https://ghp.ci/raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/AI.list
   telegram:
     <<: *DomainMrs
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/telegram.mrs
