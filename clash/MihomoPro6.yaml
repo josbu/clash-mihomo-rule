@@ -244,7 +244,7 @@ rule-providers:
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/XPTV.yaml 
   fix-direct:
     <<: *ClassicalText
-    url: https://ghp.ci/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
+    url: https://ghp.ci/raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/Direct.list
   proxyme:
     <<: *ClassicalText
     url: https://ghp.ci/raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list       
