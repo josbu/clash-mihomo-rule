@@ -128,14 +128,14 @@ dns:
   default-nameserver: ['119.29.29.29', '180.184.1.1', '223.5.5.5']
   nameserver: ['https://doh.pub/dns-query', 'https://dns.alidns.com/dns-query']
   fake-ip-filter:
-    - "rule-set:cn_domain,private_domain,fix-direct"
-    - "*.lan"
-    - "*.local"
-    - "*.home.arpa"
-    - "+.gitv.tv"
-    - "+.docker.io"
-    - "+.miwifi.com"
-    - "+.safebrowsing.apple"
+    - 'rule-set:cn_domain,private_domain,fix-direct'
+    - '*.lan'
+    - '*.local'
+    - '*.home.arpa'
+    - '+.gitv.tv'
+    - '+.docker.io'
+    - '+.miwifi.com'
+    - '+.safebrowsing.apple'
     - Mijia Cloud
     #放行NTP服务
     - time.*.com
@@ -158,9 +158,9 @@ dns:
     - ntp5.*.com
     - ntp6.*.com
     - ntp7.*.com
-    - "*.time.edu.cn"
-    - "*.ntp.org.cn"
-    - "+.pool.ntp.org"
+    - '*.time.edu.cn'
+    - '*.ntp.org.cn'
+    - '+.pool.ntp.org'
     - time1.cloud.tencent.com
 
 # 本地自建节点组
@@ -244,10 +244,10 @@ rule-providers:
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/XPTV.yaml 
   fix-direct:
     <<: *ClassicalYaml
-    url: https://ghp.ci/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/Direct.list
+    url: https://ghp.ci/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
   proxyme:
     <<: *ClassicalText
-    url: https://ghp.ci/raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list       
+    url: https://mirror.ghproxy.com/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
   speedtest:
     <<: *ClassicalYaml
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.yaml 
@@ -256,7 +256,7 @@ rule-providers:
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/emby.list   
   openai:
     <<: *DomainMrs
-    url: https://ghp.ci/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/AI.list
+    url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/openai.mrs
   telegram:
     <<: *DomainMrs
     url: https://ghp.ci/https://github.com/666OS/YYDS/raw/main/mihomo/rules/telegram.mrs
@@ -375,6 +375,8 @@ rule-providers:
 
 # 路由
 rules:
+  # >屏蔽QUIC
+  - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT-DROP
   # 常用必备
   - DST-PORT,123,DIRECT
   - IP-CIDR,95.161.76.100/31,REJECT-DROP,no-resolve
@@ -390,8 +392,8 @@ rules:
   - DOMAIN-SUFFIX,edith.xiaohongshu.com,抖快书定位
   # 域名路由
   - RULE-SET,fix-direct,直连
+  - RULE-SET,proxyme,Proxyme
   - RULE-SET,XPTV,直连
-  - RULE-SET,proxyme,Proxyme  
   - RULE-SET,private_ip,国内网站,no-resolve
   - RULE-SET,speedtest,网速测试
   - RULE-SET,openai,ChatGPT
