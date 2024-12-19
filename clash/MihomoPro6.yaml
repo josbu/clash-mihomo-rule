@@ -245,7 +245,7 @@ rule-providers:
   fix-direct:
     <<: *ClassicalYaml
     url: https://github.moeyy.xyz/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
-   proxyme:
+  proxyme:
     <<: *ClassicalText
     url: https://github.moeyy.xyz/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list    
   speedtest:
