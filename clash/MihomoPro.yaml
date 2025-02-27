@@ -8,9 +8,9 @@
 # ||      ╚═════╝  ╚═════╝  ╚═════╝      ||
 # ||                                     ||
 # >>=====================================<<
-# 名称: MihomoPro高大全 V3.1
-# 日期: 2025 年 2 月 11 日
-# 地址: https://github.com/666OS
+# 名称: MihomoPro高大全 V3.2
+# 日期: 2025 年 2 月 24 日
+# 地址: https://github.moeyy.xyz/https://github.com/666OS
 # 频道: https://t.me/Pinched666
 # 注意：在proxy-providers加入您的机场订阅链接（锚点区结束后面）
 
@@ -78,17 +78,17 @@ profile:
   store-fake-ip: true
 
 external-controller: 0.0.0.0:9090
-external-ui-url: https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip
+external-ui-url: https://github.moeyy.xyz/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip
 external-ui: ui
 external-ui-name: metacubexd
 secret: 123456
 
 # 自定 GEO 下载地址
 geox-url:
-  geosite: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
-  mmdb: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb
-  geoip: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat
-  asn: https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb
+  geosite: https://github.moeyy.xyz/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
+  mmdb: https://github.moeyy.xyz/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb
+  geoip: https://github.moeyy.xyz/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat
+  asn: https://github.moeyy.xyz/https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb
 
 sniffer:
   enable: true
@@ -169,8 +169,8 @@ proxies:
 
 # 策略组 
 proxy-groups:
-  - {name: 默认代理, <<: *SelectFB, icon: https://github.moeyy.xyz/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
-  - {name: Proxyme, <<: *SelectProxy, icon: https://github.moeyy.xyz/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/Linkeless.png}
+  - {name: 默认代理, <<: *SelectFB, icon: https://github.moeyy.xyz/https://github.moeyy.xyz/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Static.png}
+  - {name: Proxyme, <<: *SelectProxy, icon: https://github.moeyy.xyz/https://github.moeyy.xyz/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/Linkeless.png}
   - {name: 故障转移, <<: *FallBack, proxies: [香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 全球手动, 冷门自选, 直连], icon: https://github.moeyy.xyz/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ULB.png}
   - {name: 漏网之鱼, type: select, proxies: [默认代理, 直连], icon: https://github.moeyy.xyz/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png}
   - {name: 全球手动, type: select, include-all: true, filter: *FilterAll, icon: https://github.moeyy.xyz/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Clubhouse.png}
@@ -247,10 +247,10 @@ rule-providers:
     url: https://github.moeyy.xyz/https://github.com/666OS/YYDS/raw/main/mihomo/rules/XPTV.yaml 
   fix-direct:
     <<: *ClassicalYaml
-    url: https://github.moeyy.xyz/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
+    url: https://github.moeyy.xyz/https://github.moeyy.xyz/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
   proxyme:
     <<: *ClassicalText
-    url: https://github.moeyy.xyz/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
+    url: https://github.moeyy.xyz/https://github.moeyy.xyz/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
   speedtest:
     <<: *ClassicalYaml
     url: https://github.moeyy.xyz/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.yaml 
