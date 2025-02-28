@@ -2,7 +2,7 @@
 config config_subscribe
 	option enabled '1'
 	option name 'MihomoPro'
-	option address 'https://ghp.ci/raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/MihomoPro6.yaml'
+	option address 'https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/MihomoPro6.yaml'
 	option sub_ua 'clash.meta'
 	option sub_convert '0'
 	option emoji 'false'
@@ -351,12 +351,12 @@ config config_subscribe
 	option sub_convert '1'
 	option convert_address 'http://192.168.0.222:25500/sub'
 	option template '0'
-	option custom_template_url 'https://ghp.ci/https://github.com/josbu/clash-singbox-rule/blob/main/clash/ziji.ini'
+	option custom_template_url 'https://github.com/josbu/clash-singbox-rule/blob/main/clash/ziji.ini'
 	option emoji 'false'
 	option udp 'false'
 	option skip_cert_verify 'true'
 	option sort 'false'
 	option node_type 'false'
 	option rule_provider 'false'
-	option address 'https://www.temucy.com/fq/vn.php'
+	option address 'https://www.temucy.com/fq/vn1.php'
 
