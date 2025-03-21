@@ -247,10 +247,10 @@ rule-providers:
     url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/XPTV.yaml 
   fix-direct:
     <<: *ClassicalText
-    url: http://101.32.34.108:6080/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/Direct.list
+    url: http://101.32.34.108:6080/https://raw.githubusercontent.com/josbu/clash-mihomo-rule/refs/heads/main/clash-mihomo/Direct.list
   proxyme:
     <<: *ClassicalText
-    url: http://101.32.34.108:6080/https://raw.githubusercontent.com/josbu/clash-singbox-rule/refs/heads/main/clash/ProxyLite.list
+    url: http://101.32.34.108:6080/https://raw.githubusercontent.com/josbu/clash-mihomo-rule/refs/heads/main/clash-mihomo/ProxyLite.list
   speedtest:
     <<: *ClassicalYaml
     url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.yaml 
