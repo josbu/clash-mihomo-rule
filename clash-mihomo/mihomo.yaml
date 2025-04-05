@@ -121,7 +121,7 @@ proxy-groups:
   - {name: 默认代理,   <<: *SelectFB, icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Static.png}
   - {name: 故障转移,   <<: *FallBack, proxies: [香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 全球手动, 冷门自选, 直连], icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/ULB.png}
   - {name: Proxyme, <<: *SelectProxy, icon: http://101.32.34.108:6080/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/Linkeless.png}
-  - {name: 漏网之鱼,   type: select, proxies: [默认代理, 直连], icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
+  - {name: 漏网之鱼,   type: select, proxies: [直连, 默认代理], icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
   - {name: 全球手动,   type: select, include-all: true, filter: *FilterAll, icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
   - {name: 冷门自选,   type: select, include-all: true, filter: *FilterOther, icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Europe_Map.png}
   - {name: 抖快书定位, type: select, proxies: [直连, 香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略], icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Null_Nation.png}
