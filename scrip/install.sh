@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-05 16:14:46
+#!date = 2025-04-12 13:26:27
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -92,9 +92,9 @@ get_url() {
     local url=$1
     local final_url
     if [ "$use_cdn" = true ]; then
-        final_url="https://ghp.src.moe/$url"
+        final_url="https://gh-proxy.com/$url"
         if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
-            final_url="http://47.238.119.141:5000/$url"
+            final_url="https://github.boki.moe/$url"
         fi
     else
         final_url="$url"
@@ -147,14 +147,21 @@ update_system() {
 #############################
 check_ip_forward() {
     local sysctl_file="/etc/sysctl.conf"
-    if ! sysctl net.ipv4.ip_forward | grep -q "1"; then
+    # 取消注释 net.ipv4.ip_forward=1 行（允许空格）
+    sed -i 's/^#[[:space:]]*\(net\.ipv4\.ip_forward\s*=\s*1\)/\1/' "$sysctl_file"
+    # 检查当前内核参数是否为1，否则设置并确保配置文件中存在该行
+    if ! sysctl net.ipv4.ip_forward | grep -qE '=\s*1'; then
         sysctl -w net.ipv4.ip_forward=1
-        grep -q "net.ipv4.ip_forward=1" "$sysctl_file" || echo "net.ipv4.ip_forward=1" >> "$sysctl_file"
+        grep -Eq '^net\.ipv4\.ip_forward\s*=\s*1' "$sysctl_file" || echo "net.ipv4.ip_forward=1" >> "$sysctl_file"
     fi
-    if ! sysctl net.ipv6.conf.all.forwarding | grep -q "1"; then
+    # 取消注释 net.ipv6.conf.all.forwarding=1 行（允许空格）
+    sed -i 's/^#[[:space:]]*\(net\.ipv6\.conf\.all\.forwarding\s*=\s*1\)/\1/' "$sysctl_file"
+    # 检查 IPv6 转发状态，不为1则设置，并写入配置文件
+    if ! sysctl net.ipv6.conf.all.forwarding | grep -qE '=\s*1'; then
         sysctl -w net.ipv6.conf.all.forwarding=1
-        grep -q "net.ipv6.conf.all.forwarding=1" "$sysctl_file" || echo "net.ipv6.conf.all.forwarding=1" >> "$sysctl_file"
+        grep -Eq '^net\.ipv6\.conf\.all\.forwarding\s*=\s*1' "$sysctl_file" || echo "net.ipv6.conf.all.forwarding=1" >> "$sysctl_file"
     fi
+    # 重新加载配置文件，使改动生效
     sysctl -p > /dev/null
 }
 
@@ -256,7 +263,7 @@ download_shell() {
 config_mihomo() {
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
-    local tun_config_url="https://raw.githubusercontent.com/josbu/clash-mihomo-rule/refs/heads/main/clash-mihomo/mihomo.yaml"
+    local tun_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
     local tproxy_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
     local iface ipv4 ipv6 config_url
     iface=$(ip route | awk '/default/ {print $5}')
@@ -326,6 +333,7 @@ install_mihomo() {
     local folders="/root/mihomo"
     rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders"
+    check_ip_forward
     check_distro
     echo -e "${yellow}当前系统版本：${reset}[ ${green}${distro}${reset} ]"
     get_schema
