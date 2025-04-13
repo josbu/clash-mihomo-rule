@@ -52,7 +52,7 @@ ClassicalYaml: &ClassicalYaml {type: http, interval: 86400, behavior: classical,
 # 远程订阅组
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[A]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
-  机场A: {<<: *PProviders, url: 'https://sub.temucy.com/by?sub', override: {additional-prefix: '[A] '}}
+  机场A: {<<: *PProviders, url: 'https://sub/by?sub', override: {additional-prefix: '[A] '}}
   机场B: {<<: *PProviders, url: '机场订阅地址', override: {additional-prefix: '[B] '}}
 
 # 全局配置
