@@ -181,8 +181,8 @@ rule-providers:
   download:                  {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/download.yaml}
   location_ip:               {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/location_ip.yaml}
   XPTV:                      {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/XPTV.yaml}
-  fix-direct:                {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/josbu/clash-mihomo-rule/main/clash-mihomo/Direct.yaml}
-  proxyme:                   {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/josbu/clash-mihomo-rule/main/clash-mihomo/ProxyLite.yaml}
+  fix-direct:                {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/josbu/clash-mihomo-rule/raw/main/clash-mihomo/Direct.yaml}
+  proxyme:                   {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/josbu/clash-mihomo-rule/raw/main/clash-mihomo/ProxyLite.yaml}
   Line:                      {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/Line.yaml}
   speedtest:                 {<<: *ClassicalYaml, url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.yaml}
   emby:                      {<<: *ClassicalText, url: http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/emby.list}
