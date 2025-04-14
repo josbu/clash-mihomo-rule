@@ -48,6 +48,7 @@ IPcidrText: &IPcidrText {type: http, interval: 86400, behavior: ipcidr, format: 
 ClassicalText: &ClassicalText {type: http, interval: 86400, behavior: classical, format: text}
 ClassicalYaml: &ClassicalYaml {type: http, interval: 86400, behavior: classical, format: yaml}
 ############################################## - ⚓️ 锚点区结束 - ############################################## 
+
 # 机场配置
 
 # 全局配置
@@ -147,7 +148,7 @@ proxy-groups:
   - {name: 全球手动,   type: select, include-all: true, filter: *FilterAll, icon:  http://101.32.34.108:6080/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Clubhouse.png}
   - {name: 冷门自选,   type: select, include-all: true, filter: *FilterOther, icon:  http://101.32.34.108:6080/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Europe_Map.png}
   - {name: 抖快书定位, type: select, proxies: [直连, 香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略], icon:  http://101.32.34.108:6080/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Null_Nation.png}
-  - {name: 漏网之鱼,   type: select, proxies: [直连, 默认代理], icon:  http://101.32.34.108:6080/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
+  - {name: 漏网之鱼,   type: select, proxies: [默认代理, 直连], icon:  http://101.32.34.108:6080/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png}
   # 自动测速
   - {name: 香港自动,        <<: *UrlTest, filter: *FilterHK, icon:  http://101.32.34.108:6080/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
   - {name: 台湾自动,        <<: *UrlTest, filter: *FilterTW, icon:  http://101.32.34.108:6080/https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png}
@@ -178,8 +179,8 @@ rule-providers:
   download:                  {<<: *ClassicalYaml, url:  http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/download.yaml}
   location_ip:               {<<: *ClassicalYaml, url:  http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/location_ip.yaml}
   XPTV:                      {<<: *ClassicalYaml, url:  http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/XPTV.yaml}
-  fix-direct:                {<<: *ClassicalText, url:  http://101.32.34.108:6080/https://raw.githubusercontent.com/josbu/clash-mihomo-rule/refs/heads/main/clash-mihomo/Direct.txt}
-  proxyme:                   {<<: *ClassicalText, url:  http://101.32.34.108:6080/https://raw.githubusercontent.com/josbu/clash-mihomo-rule/refs/heads/main/clash-mihomo/ProxyLite.txt}
+  fix-direct:                {<<: *ClassicalYaml, url:  http://101.32.34.108:6080/https://github.com/josbu/clash-mihomo-rule/raw/main/clash-mihomo/Direct.yaml}
+  proxyme:                   {<<: *ClassicalYaml, url:  http://101.32.34.108:6080/https://github.com/josbu/clash-mihomo-rule/raw/main/clash-mihomo/ProxyLite.yaml}
   Line:                      {<<: *ClassicalYaml, url:  http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/Line.yaml}
   speedtest:                 {<<: *ClassicalYaml, url:  http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.yaml}
   emby:                      {<<: *ClassicalText, url:  http://101.32.34.108:6080/https://github.com/666OS/YYDS/raw/main/mihomo/rules/emby.list}
