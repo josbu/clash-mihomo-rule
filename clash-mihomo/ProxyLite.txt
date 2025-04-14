@@ -1,21 +1,17 @@
-# 域名匹配
-DOMAIN-SUFFIX,6bcloud.top
-DOMAIN-SUFFIX,viptwo.top
-DOMAIN-SUFFIX,followme.com
-DOMAIN-SUFFIX,followme.ceo
-DOMAIN-SUFFIX,whatsmydns.me
-DOMAIN-SUFFIX,onlinejobs.ph
-DOMAIN-SUFFIX,v2rayssr.com
-DOMAIN-SUFFIX,qichiyu.com
-DOMAIN-SUFFIX,6bcloud.top
-DOMAIN-SUFFIX,viptwo.top
-DOMAIN-SUFFIX,followme.com
-DOMAIN-SUFFIX,followme.ceo
-DOMAIN-SUFFIX,whatsmydns.me
-DOMAIN-SUFFIX,yugogo.xyz
-DOMAIN-SUFFIX,docker.com
-DOMAIN-SUFFIX,hostloc.com
-DOMAIN-SUFFIX,nodeseek.com
-DOMAIN-SUFFIX,temu.com
-DOMAIN-SUFFIX,cosmotown.com
-DOMAIN-SUFFIX,chat100.ai
+# 域名匹配（去重版）
+DOMAIN-SUFFIX:
+  - 6bcloud.top
+  - viptwo.top
+  - followme.com
+  - followme.ceo
+  - whatsmydns.me
+  - onlinejobs.ph
+  - v2rayssr.com
+  - qichiyu.com
+  - yugogo.xyz
+  - docker.com
+  - hostloc.com
+  - nodeseek.com
+  - temu.com
+  - cosmotown.com
+  - chat100.ai
