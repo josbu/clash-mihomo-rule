@@ -1,0 +1,29 @@
+# 内容：OpenAi Bard anthropic
+# 域名关键字匹配
+DOMAIN-KEYWORD:
+  - openai
+  - anthropic
+  - Claude
+
+# 域名后缀匹配
+DOMAIN-SUFFIX:
+  - perplexity.ai
+  - chatgpt.com
+  - auth0.com
+  - client-api.arkoselabs.com
+  - events.statsigapi.net
+  - featuregates.org
+  - identrust.com
+  - intercom.io
+  - intercomcdn.com
+  - oaistatic.com
+  - oaiusercontent.com
+  - openai.com
+  - openaiapi-site.azureedge.net
+  - sentry.io
+  - stripe.com
+  - bard.google.com
+  - gemini.google.com
+  - makersuite.google.com
+  - anthropic.com
+  - claude.ai
