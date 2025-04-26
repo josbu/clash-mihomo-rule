@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-16 14:07:23
+#!date = 2025-04-26 16:53:20
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -76,12 +76,8 @@ check_distro() {
 #       网络检测函数         #
 #############################
 check_network() {
-    if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
-        echo -e "${green}检测到没有有科学环境，使用 CDN${reset}" >&2
+    if ! curl -sI --connect-timeout 1 https://www.google.com > /dev/null; then
         use_cdn=true
-    else
-        echo -e "${green}检测到有科学环境，不使用 CDN${reset}" >&2
-        use_cdn=false
     fi
 }
 
@@ -256,9 +252,8 @@ download_shell() {
 #       配置文件生成函数     #
 #############################
 get_network_info() {
-  local default_iface
+  local default_iface ipv4 ipv6
   default_iface=$(ip route | awk '/default/ {print $5}' | head -n 1)
-  local ipv4 ipv6
   ipv4=$(ip addr show "$default_iface" | awk '/inet / {print $2}' | cut -d/ -f1)
   ipv6=$(ip addr show "$default_iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
   echo "$default_iface $ipv4 $ipv6"
@@ -337,11 +332,8 @@ config_mihomo() {
   local root_folder="/root/mihomo"
   local config_file="/root/mihomo/config.yaml"
   local remote_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
-
   mkdir -p "$root_folder"
-
   read default_iface ipv4 ipv6 <<< "$(get_network_info)"
-
   echo -e "${green}请选择运行模式 (推荐使用 TUN 模式)${reset}"
   echo -e "${cyan}-------------------------${reset}"
   echo -e "${green}1${reset}. TUN 模式"
@@ -351,33 +343,28 @@ config_mihomo() {
   mode_choice=${mode_choice:-1}
   local mode_config
   mode_config=$(generate_mode_config "$default_iface" "$mode_choice")
-
   wget -t 3 -T 30 -q -O "$config_file" "$(get_url "$remote_config_url")" || { 
     echo -e "${red}配置文件下载失败${reset}"
     exit 1
   }
-
   awk -v config="$mode_config" '
     /^# 模式配置/ { print; print config; next }
     { print }
   ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
-
   local proxy_providers
   proxy_providers=$(collect_proxy_providers)
   awk -v providers="$proxy_providers" '
     /^# 机场配置/ { print; print providers; next }
     { print }
   ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
-
   service_restart
-
   echo -e "${green}配置完成，配置文件已保存到：${yellow}${config_file}${reset}"
   echo -e "${green}mihomo 配置完成，正在启动中${reset}"
   echo -e "${red}管理面板地址和管理命令${reset}"
   echo -e "${cyan}=========================${reset}"
   echo -e "${green}http://$ipv4:9090/ui${reset}"
   echo -e ""
-  echo -e "${green}输入: mihomo 进入管理菜单${reset}"
+  echo -e "${green}输入: ${yellow}mihomo ${green}进入管理菜单${reset}"
   echo -e "${cyan}=========================${reset}"
   echo -e "${green}mihomo 已成功启动并设置为开机自启${reset}"
 }
@@ -395,25 +382,26 @@ install_mihomo() {
     echo -e "${yellow}当前系统架构：${reset}[ ${green}${arch_raw}${reset} ]"
     download_version
     echo -e "${yellow}当前软件版本：${reset}[ ${green}${version}${reset} ]"
+    echo -e "${green}开始下载 mihomo 请等待${reset}"
     download_mihomo
+    echo -e "${green}开始下载配置服务请等待${reset}"
     download_service
+    echo -e "${green}开始下载管理 UI 请等待${reset}"
     download_wbeui
+    echo -e "${green}开始下载菜单脚本请等待${reset}"
     download_shell
     echo -e "${green}恭喜你! mihomo 已经安装完成${reset}"
-    echo -e "${red}输入 y/Y 下载默认配置${reset}"
-    echo -e "${red}输入 n/N 取消下载默认配置${reset}"
-    echo -e "${red}把你自己的配置上传到 ${folders} 目录下(文件名必须为 config.yaml)${reset}"
+    echo -e "${red}输入 y/Y 下载默认配置文件${reset}"
+    echo -e "${red}输入 n/N 取消下载默认配置, 需要上传你准备好的配置文件${reset}"
+    echo -e "${red}把你准备好的配置文件上传到 ${folders} 目录下(文件名必须为 config.yaml)${reset}"
     read -p "$(echo -e "${yellow}请输入选择(y/n) [默认: y]: ${reset}")" confirm
     confirm=${confirm:-y}
     case "$confirm" in
         [Yy]*)
             config_mihomo
             ;;
-        [Nn]*)
-            echo -e "${green}跳过配置文件下载${reset}"
-            ;;
          *)
-            echo -e "${red}无效选择，跳过配置文件下载${reset}"
+            echo -e "${green}跳过配置文件下载${reset}"
             ;;
     esac
     rm -f /root/install.sh
