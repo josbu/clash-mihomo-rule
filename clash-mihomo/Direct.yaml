@@ -6,7 +6,7 @@ payload:
 - DOMAIN-SUFFIX,douyin.com
 - DOMAIN-SUFFIX,test-ipv6.com
 - DOMAIN-SUFFIX,cloudflare.com
-- DOMAIN-SUFFIX,us.kg
+- DOMAIN-SUFFIX,easytier.top
 - DOMAIN-SUFFIX,windows.com
 - DOMAIN-SUFFIX,nist.gov
 - DOMAIN-SUFFIX,189.cn
@@ -29,6 +29,7 @@ payload:
 - IP-CIDR,180.76.76.76/32,no-resolve
 - IP-CIDR,114.114.114.114/32,no-resolve
 - IP-CIDR,114.114.115.115/32,no-resolve
+- IP-CIDR,183.66.27.14/32,no-resolve
 
 # 360
 - DOMAIN-SUFFIX,360.com
