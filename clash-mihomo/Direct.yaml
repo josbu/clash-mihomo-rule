@@ -1,6 +1,5 @@
 payload:
 # 直连补充列表(国内域名不解析时，防止走代理使用)
-- DOMAIN-SUFFIX,time.windows.com
 - DOMAIN-SUFFIX,lanzov.com
 - DOMAIN-SUFFIX,hao123.com
 - DOMAIN-SUFFIX,douyin.com
