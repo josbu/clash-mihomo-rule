@@ -6,8 +6,6 @@ payload:
 - DOMAIN-SUFFIX,test-ipv6.com
 - DOMAIN-SUFFIX,cloudflare.com
 - DOMAIN-SUFFIX,easytier.top
-- DOMAIN-SUFFIX,windows.com
-- DOMAIN-SUFFIX,nist.gov
 - DOMAIN-SUFFIX,189.cn
 - DOMAIN-SUFFIX,istoreos.com
 
