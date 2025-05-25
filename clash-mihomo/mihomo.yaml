@@ -39,7 +39,7 @@ SelectFB: &SelectFB {type: select, proxies: [故障转移, OpenAI策略, 香港�
 SelectHK: &SelectHK {type: select, proxies: [香港策略, OpenAI策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 冷门自选, 全球手动, 链式代理, 直连]}
 SelectSG: &SelectSG {type: select, proxies: [新加坡策略, 故障转移, OpenAI策略, 香港策略, 台湾策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 冷门自选, 全球手动, 链式代理, 直连]}
 SelectUS: &SelectUS {type: select, proxies: [美国策略, 故障转移, OpenAI策略, 香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 欧盟策略, 冷门自选, 全球手动, 链式代理, 直连]}
-SelectProxy: &SelectProxy {type: select, proxies: [默认代理, 故障转移, ChatGPT, OpenAI策略, 香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 冷门自选, 全球手动, 链式代理, 直连]}
+SelectProxy: &SelectProxy {type: select, proxies: [默认代理, 故障转移, OpenAI策略, 香港策略, 台湾策略, 新加坡策略, 日本策略, 韩国策略, 美国策略, 欧盟策略, 冷门自选, 全球手动, 链式代理, 直连]}
 # 锚点 - 规则集
 DomainMrs: &DomainMrs {type: http, interval: 86400, behavior: domain, format: mrs}
 DomainText: &DomainText {type: http, interval: 86400, behavior: domain, format: text}
