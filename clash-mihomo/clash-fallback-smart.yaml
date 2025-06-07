@@ -77,8 +77,8 @@ ClassicalYaml: &ClassicalYaml {type: http, interval: 86400, behavior: classical,
 
 # 远程订阅组
 proxy-providers:
-  机场A: {<<: *PProviders, url: 'https://sub.temucy.com/by', override: {additional-prefix: '[A] '}}
-  机场B: {<<: *PProviders, url: 'http://10.1.1.200:8199/all.yaml', override: {additional-prefix: '[B] '}}
+  机场A: {<<: *PProviders, url: 'https://sub.temu.com/by', override: {additional-prefix: '[A] '}}
+  机场B: {<<: *PProviders, url: 'http://10.1.3.200:8199/all.yaml', override: {additional-prefix: '[B] '}}
 
 # 全局配置
 port: 7890
