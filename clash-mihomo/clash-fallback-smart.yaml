@@ -73,8 +73,8 @@ ClassicalYaml: &ClassicalYaml {type: http, interval: 86400, behavior: classical,
 
 # 远程订阅组
 proxy-providers:
-  机场A: {<<: *PProviders, url: 'https://sub.temucy.com/ddhg', override: {additional-prefix: '[A] '}}
-  机场B: {<<: *PProviders, url: 'http://10.1.1.10:8199/all.yaml', override: {additional-prefix: '[B] '}}
+  机场A: {<<: *PProviders, url: 'https://sub.temucry.com/by', override: {additional-prefix: '[A] '}}
+  机场B: {<<: *PProviders, url: 'http://10.1.2.200:8199/all.yaml', override: {additional-prefix: '[B] '}}
 
 # 全局配置
 port: 7890
@@ -236,7 +236,7 @@ proxy-groups:
     icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ULB.png
 
   # --- 应用分流组 ---
-  - {name: Gemini, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google Search.png} # <-- 新增
+  - {name: Gemini, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://github.com/josbu/QuanX-icon-rule/raw/main/icon/gemini.png} # <-- 新增
   - {name: ChatGPT, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/ChatGPT-green.png}
   - {name: AI平台, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Bot.png}
   - {name: Emby, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Emby.png}
@@ -254,7 +254,7 @@ proxy-groups:
   - {name: 网速测试, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Speedtest.png}
   - {name: Github, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/github(1).png}
   - {name: 微软服务, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png}
-  - {name: 谷歌服务, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google Search.png}
+  - {name: 谷歌服务, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://github.com/josbu/Qure/raw/master/IconSet/Google_Search.png}
   - {name: 苹果服务, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png}
   - {name: 脸书服务, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Facebook.png}
   - {name: 国外网站, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Orz-3/mini/master/Color/Global.png}
@@ -287,8 +287,8 @@ proxy-groups:
   - {name: 欧盟-智选, <<: *Smart, filter: *FilterEU, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png}
   - {name: OpenAI-手选, type: select, include-all: true, filter: *FilterOpenAI, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/ChatGPT-green.png}
   - {name: OpenAI-智选, <<: *Smart, filter: *FilterOpenAI, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/ChatGPT-green.png}
-  - {name: Gemini-手选, type: select, include-all: true, filter: *FilterGemini, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google Search.png} # <-- 新增
-  - {name: Gemini-智选, <<: *Smart, filter: *FilterGemini, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png} # <-- 新增
+  - {name: Gemini-手选, type: select, include-all: true, filter: *FilterGemini, icon: http://74.48.27.209:7210/https://github.com/josbu/QuanX-icon-rule/raw/main/icon/gemini.png} # <-- 新增
+  - {name: Gemini-智选, <<: *Smart, filter: *FilterGemini, icon: http://74.48.27.209:7210/https://github.com/josbu/QuanX-icon-rule/raw/main/icon/gemini.png} # <-- 新增
   - {name: 其他地区-手选, type: select, include-all: true, filter: *FilterOther, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Orz-3/mini/master/Color/XD.png}
   - {name: 其他地区-智选, <<: *Smart, filter: *FilterOther, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png}
 
