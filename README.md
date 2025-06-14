@@ -17,3 +17,7 @@
 ### 4. Smart 内核增强版  
 [vernesong/mihomo](https://github.com/vernesong/mihomo/releases)  
 > 🔥 **Smart内核分支** | 深度优化的Clash内核增强版（规则/性能/兼容性全面提升）
+
+### 5.Rustdesk
+[RustDesk](https://github.com/lejianwen/rustdesk-server)
+> 自建远程
