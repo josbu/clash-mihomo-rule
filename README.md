@@ -21,3 +21,7 @@
 ### 5.Rustdesk
 [RustDesk](https://github.com/lejianwen/rustdesk-server)
 > 自建远程
+
+### 6.影视看剧
+[PG本地包]https://github.com/fish2018/PG
+> 看剧
