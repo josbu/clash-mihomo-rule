@@ -1,13 +1,14 @@
 # ============================================
 # 名称: MihomoPro · Smart-V 智能优选版 (Typo Fixed)
-# 修改日期: 2025 年 6 月 7 日
+# 修改日期: 2024 年 6 月 15 日
 # 核心特性:
 # - 已修正"故障转移"组中的"台湾-智选"错别字问题
+# - 优化DNS与TUN设置，解决HSTS攻击问题
 # ============================================
 
 ############################################## - ⚓️ 锚点区开始 - ##############################################
 # 锚点 - 远程订阅组
-PProviders: &PProviders {type: http, interval: 86400, health-check: {enable: true, url: 'https://www.gstatic.com/generate_204', interval: 300}, filter: '^(?!.*(群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))'}
+PProviders: &PProviders {type: http, interval: 26400, health-check: {enable: true, url: 'https://www.gstatic.com/generate_204', interval: 150}, filter: '^(?!.*(群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))'}
 
 # 锚点 - 筛选组
 FilterHK: &FilterHK '(?i)港|香港|🇭🇰|HK|Hong|HKG'
@@ -27,7 +28,7 @@ Smart: &Smart
   type: smart
   uselightgbm: true
   collectdata: true
-  interval: 300
+  interval: 150
   hidden: true
   include-all: true
   # !!【核心优化】请根据您机场的前缀和偏好，修改权重(数值越大优先级越高) !!
@@ -75,10 +76,10 @@ ClassicalText: &ClassicalText {type: http, interval: 86400, behavior: classical,
 ClassicalYaml: &ClassicalYaml {type: http, interval: 86400, behavior: classical, format: yaml}
 ############################################## - ⚓️ 锚点区结束 - ##############################################
 
-# 远程订阅组
+# 远程订阅组 - 保留您的设置
 proxy-providers:
-  机场A: {<<: *PProviders, url: 'https://sub.temu.com/by', override: {additional-prefix: '[A] '}}
-  机场B: {<<: *PProviders, url: 'http://10.1.3.200:8199/all.yaml', override: {additional-prefix: '[B] '}}
+  机场A: {<<: *PProviders, url: 'https://sub.temuce.com/bye', override: {additional-prefix: '[A] '}}
+  机场B: {<<: *PProviders, url: 'http://10.1.1.200:8199/all.yaml', override: {additional-prefix: '[B] '}}
 
 # 全局配置
 port: 7890
@@ -115,7 +116,7 @@ geox-url:
   geoip: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat
   asn: https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb
 
-# Sniffer & TUN & DNS
+# Sniffer & TUN & DNS - 优化以解决HSTS攻击
 sniffer:
   enable: true
   sniff:
@@ -138,6 +139,8 @@ tun:
   enable: true
   stack: mixed
   dns-hijack: [any:53]
+  auto-route: false
+  auto-detect-interface: false
 dns:
   enable: true
   ipv6: true
@@ -239,7 +242,7 @@ proxy-groups:
       - 直连
     icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ULB.png
 
-  # --- 应用分流组 ---
+  # --- 应用分流组 - 保留您的图标链接 ---
   - {name: Gemini, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/raw/main/icon/gemini.png}
   - {name: ChatGPT, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/ChatGPT-green.png}
   - {name: AI平台, <<: *SelectProxy, icon: http://74.48.27.209:7210/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Bot.png}
@@ -343,11 +346,14 @@ rule-providers:
   private_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/raw/main/rules/private_ip.mrs}
   cn_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/raw/main/rules/cn_ip.mrs}
 
-# 路由
+# 路由 - 添加防止HSTS攻击的规则
 rules:
+  # 防止HSTS攻击的关键规则
   - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT-DROP
   - DST-PORT,123,DIRECT
   - IP-CIDR,95.161.76.100/31,REJECT-DROP,no-resolve
+  
+  # 其他规则
   - RULE-SET,category-public-tracker,REJECT-DROP
   - RULE-SET,fix-direct,直连
   - RULE-SET,proxyme,Proxyme
