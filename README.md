@@ -16,4 +16,4 @@
 [RustDesk](https://github.com/lejianwen/rustdesk-server)
 
 ##### 6.影视看剧
-[PG本地包]https://github.com/fish2018/PG
+[PG本地包](https://github.com/fish2018/PG)
