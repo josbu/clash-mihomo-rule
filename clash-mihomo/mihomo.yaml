@@ -1,18 +1,3 @@
-# >>=====================================<<
-# ||                                     ||
-# ||      ██████╗  ██████╗  ██████╗      ||
-# ||     ██╔════╝ ██╔════╝ ██╔════╝      ||
-# ||     ███████╗ ███████╗ ███████╗      ||
-# ||     ██╔═══██╗██╔═══██╗██╔═══██╗     ||
-# ||     ╚██████╔╝╚██████╔╝╚██████╔╝     ||
-# ||      ╚═════╝  ╚═════╝  ╚═════╝      ||
-# ||                                     ||
-# >>=====================================<<
-# 名称: MihomoPro高大全 V3.3
-# 日期: 2025 年 3 月 15 日
-# 地址: https://github.com/666OS
-# 频道: https://t.me/Pinched666
-# 注意：在proxy-providers加入您的机场订阅链接（锚点区结束后面）
 
 ############################################## - ⚓️ 锚点区开始 - ##############################################
 # 锚点 - 远程订阅组
@@ -54,8 +39,8 @@ ClassicalYaml: &ClassicalYaml {type: http, interval: 86400, behavior: classical,
 # 远程订阅组
 # 注意：请提供您的机场订阅链接，每个链接一行，并为每个机场命名，末尾的[A]为每个节点添加机场名称前缀，可自定义
 proxy-providers:
-  机场A: {<<: *PProviders, url: 'https://sub.temutyzcy.com/by', override: {additional-prefix: '[A] '}}
-  机场B: {<<: *PProviders, url: 'http://10.1.13.200:8199/all.yaml', override: {additional-prefix: '[B] '}}
+  机场A: {<<: *PProviders, url: 'https://sub.temucecy.com/bye', override: {additional-prefix: '[A] '}}
+  机场B: {<<: *PProviders, url: 'http://10.1.1.200:8199/all.yaml', override: {additional-prefix: '[B] '}}
 
 # 全局配置
 port: 7890
@@ -251,51 +236,51 @@ proxy-groups:
 
 # 远程规则集
 rule-providers:
-  location_ip: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/location_ip.yaml}
-  XPTV: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/XPTV.yaml}
+  location_ip: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/location_ip.yaml}
+  XPTV: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/XPTV.yaml}
   fix-direct: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/raw/main/clash-mihomo/Direct.yaml}
   proxyme: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/raw/main/clash-mihomo/ProxyLite.yaml}
-  speedtest: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/speedtest.yaml}
-  emby: {<<: *ClassicalText, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/emby.list}
-  openai: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/openai.mrs}
+  speedtest: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/speedtest.yaml}
+  emby: {<<: *ClassicalText, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/emby.list}
+  openai: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/openai.mrs}
   gemini: {<<: *ClassicalYaml, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/raw/main/rules/Gemini.yaml} # Ensure this file exists or is created
-  telegram: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/telegram.mrs}
-  twitter: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/twitter.mrs}
-  instagram: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/instagram.mrs}
-  youtube: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/youtube.mrs}
-  spotify: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/spotify.mrs}
-  netflix: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/netflix.mrs}
-  disney: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/disney.mrs}
-  hbo: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/hbo.mrs}
-  tiktok: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/tiktok.mrs}
-  github: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/github.mrs}
-  onedrive: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/onedrive.mrs}
-  microsoft: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/microsoft.mrs}
-  facebook: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/facebook.mrs}
-  meta: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/meta.mrs}
-  google: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/google.mrs}
-  apple-cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/apple-cn.mrs}
-  apple: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/apple.mrs}
-  paypal@cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/paypal@cn.mrs}
-  paypal: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/paypal.mrs}
-  cloudflare-cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/cloudflare-cn.mrs}
-  category-public-tracker: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/category-public-tracker.mrs}
-  category-games: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/category-games.mrs}
-  category-media-cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/category-media-cn.mrs}
-  category-media: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/category-media.mrs}
-  category-cryptocurrency: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/category-cryptocurrency.mrs}
-  category-social-media-!cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/category-social-media-!cn.mrs}
-  category-ai-chat-!cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/category-ai-chat-!cn.mrs}
-  geolocation-!cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/geolocation-!cn.mrs}
-  private_domain: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/private.mrs}
-  cn_domain: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/cn.mrs}
-  facebook_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/facebook_ip.mrs}
-  google_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/google_ip.mrs}
-  netflix_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/netflix_ip.mrs}
-  twitter_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/twitter_ip.mrs}
-  telegram_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/telegram_ip.mrs}
-  private_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/private_ip.mrs}
-  cn_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/666OS/YYDS/raw/main/mihomo/rules/cn_ip.mrs}
+  telegram: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/telegram.mrs}
+  twitter: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/twitter.mrs}
+  instagram: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/instagram.mrs}
+  youtube: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/youtube.mrs}
+  spotify: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/spotify.mrs}
+  netflix: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/netflix.mrs}
+  disney: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/disney.mrs}
+  hbo: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/hbo.mrs}
+  tiktok: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/tiktok.mrs}
+  github: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/github.mrs}
+  onedrive: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/onedrive.mrs}
+  microsoft: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/microsoft.mrs}
+  facebook: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/facebook.mrs}
+  meta: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/meta.mrs}
+  google: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/google.mrs}
+  apple-cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/apple-cn.mrs}
+  apple: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/apple.mrs}
+  paypal@cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/paypal@cn.mrs}
+  paypal: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/paypal.mrs}
+  cloudflare-cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/cloudflare-cn.mrs}
+  category-public-tracker: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/category-public-tracker.mrs}
+  category-games: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/category-games.mrs}
+  category-media-cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/category-media-cn.mrs}
+  category-media: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/category-media.mrs}
+  category-cryptocurrency: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/category-cryptocurrency.mrs}
+  category-social-media-!cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/category-social-media-!cn.mrs}
+  category-ai-chat-!cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/category-ai-chat-!cn.mrs}
+  geolocation-!cn: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/geolocation-!cn.mrs}
+  private_domain: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/private.mrs}
+  cn_domain: {<<: *DomainMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/cn.mrs}
+  facebook_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/facebook_ip.mrs}
+  google_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/google_ip.mrs}
+  netflix_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/netflix_ip.mrs}
+  twitter_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/twitter_ip.mrs}
+  telegram_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/telegram_ip.mrs}
+  private_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/private_ip.mrs}
+  cn_ip: {<<: *IPcidrMrs, url: http://74.48.27.209:7210/https://github.com/josbu/clash-mihomo-rule/blob/main/rules/cn_ip.mrs}
 
 # 路由
 rules:
