@@ -10,6 +10,8 @@ payload:
 - DOMAIN-SUFFIX,istoreos.com
 - DOMAIN-SUFFIX,oplist.org
 - DOMAIN-SUFFIX,bing.com
+- DOMAIN-SUFFIX,amazon.com
+- DOMAIN-SUFFIX,amazon.co.uk
 # 域名关键字匹配
 - DOMAIN-KEYWORD,baidu
 
