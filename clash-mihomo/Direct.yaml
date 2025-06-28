@@ -10,6 +10,8 @@ payload:
 - DOMAIN-SUFFIX,bing.com
 - DOMAIN-SUFFIX,amazon.com
 - DOMAIN-SUFFIX,amazon.co.uk
+- DOMAIN-SUFFIX,amazon.de
+
 # 域名关键字匹配
 - DOMAIN-KEYWORD,baidu
 
