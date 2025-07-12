@@ -11,7 +11,7 @@ payload:
 - DOMAIN-SUFFIX,amazon.com
 - DOMAIN-SUFFIX,amazon.co.uk
 - DOMAIN-SUFFIX,amazon.de
-
+- DOMAIN-SUFFIX,temucy.com
 # 域名关键字匹配
 - DOMAIN-KEYWORD,baidu
 
