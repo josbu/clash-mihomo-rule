@@ -11,6 +11,7 @@ payload:
 - DOMAIN-SUFFIX,amazon.com
 - DOMAIN-SUFFIX,amazon.co.uk
 - DOMAIN-SUFFIX,amazon.de
+- DOMAIN-SUFFIX,wpurl.cc
 
 
 # 域名关键字匹配
