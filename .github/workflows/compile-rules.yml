@@ -16,35 +16,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- 这是最关键的修改 ---
       - name: Download Mihomo Core (Stable Version)
         run: |
-          # 我们不再使用API查询，而是直接下载一个可靠的正式版
           wget -O mihomo.gz "https://github.com/MetaCubeX/mihomo/releases/download/v1.18.1/mihomo-linux-amd64-v1.18.1.gz"
           gunzip mihomo.gz
           chmod +x mihomo
           echo "Mihomo core (Stable Version) downloaded and ready."
 
-      - name: Create compiled rules directory
-        run: mkdir -p compiled_rules
-
-      - name: Compile all rule files
+      # --- 使用 find 命令递归遍历所有子目录 ---
+      - name: Compile all rule files with directory structure
         run: |
-          for file in rules/*; do
-            if [ -f "$file" ]; then
-              filename=$(basename -- "$file")
-              filename_no_ext="${filename%.*}"
-              
-              echo "Compiling $file -> compiled_rules/${filename_no_ext}.mrs"
-              ./mihomo rule-set compile "$file" -o "compiled_rules/${filename_no_ext}.mrs"
-            fi
-          done
+          # 使用 find 命令来查找 rules 目录下的所有文件
+          find rules -type f | while read file; do
+            # 获取相对路径 (例如: clash-mihomo/Direct.yaml)
+            relative_path="${file#rules/}"
+            # 获取包含子目录的目标路径 (例如: compiled_rules/clash-mihomo)
+            target_dir="compiled_rules/$(dirname "$relative_path")"
+            # 获取不带扩展名的文件名 (例如: Direct)
+            filename_no_ext=$(basename "${relative_path%.*}")
+            # 最终的输出文件路径 (例如: compiled_rules/clash-mihomo/Direct.mrs)
+            output_file="${target_dir}/${filename_no_ext}.mrs"
 
-      - name: Commit and push compiled files
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: Auto-compile MRS rule sets"
-          file_pattern: 'compiled_rules/*.mrs'
-          commit_user_name: "GitHub Actions Bot"
-          commit_user_email: "actions@github.com"
-          commit_author: "GitHub Actions Bot <actions@github.com>"
+            # 创建目标子目录
+            mkdir -p "$target_dir"
+            
+            echo "Compiling $file -> $output_file"
+            # 执行编译命令
+            ./mihomo rule-
