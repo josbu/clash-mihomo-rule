@@ -23,23 +23,29 @@ jobs:
           chmod +x mihomo
           echo "Mihomo core (Stable Version) downloaded and ready."
 
-      # --- 使用 find 命令递归遍历所有子目录 ---
-      - name: Compile all rule files with directory structure
+      # --- 这是最终修正版的脚本 ---
+      - name: Compile all rule files
         run: |
-          # 使用 find 命令来查找 rules 目录下的所有文件
-          find rules -type f | while read file; do
-            # 获取相对路径 (例如: clash-mihomo/Direct.yaml)
+          find rules -type f | while read -r file; do
             relative_path="${file#rules/}"
-            # 获取包含子目录的目标路径 (例如: compiled_rules/clash-mihomo)
-            target_dir="compiled_rules/$(dirname "$relative_path")"
-            # 获取不带扩展名的文件名 (例如: Direct)
-            filename_no_ext=$(basename "${relative_path%.*}")
-            # 最终的输出文件路径 (例如: compiled_rules/clash-mihomo/Direct.mrs)
-            output_file="${target_dir}/${filename_no_ext}.mrs"
-
-            # 创建目标子目录
+            parent_dir=$(dirname "$relative_path")
+            target_dir="compiled_rules/$parent_dir"
+            
+            filename=$(basename "$relative_path")
+            filename_no_ext="${filename%.*}"
+            output_file="$target_dir/$filename_no_ext.mrs"
+            
             mkdir -p "$target_dir"
             
-            echo "Compiling $file -> $output_file"
-            # 执行编译命令
-            ./mihomo rule-
+            echo "Compiling '$file' -> '$output_file'"
+            ./mihomo rule-set compile "$file" -o "$output_file"
+          done
+
+      - name: Commit and push compiled files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: Auto-compile MRS rule sets"
+          file_pattern: 'compiled_rules/**'
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "actions@github.com"
+          commit_author: "GitHub Actions Bot <actions@github.com>"
