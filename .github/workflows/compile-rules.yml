@@ -5,7 +5,6 @@ on:
     branches:
       - main
     paths:
-      # 只在 .txt 或 .yaml 文件发生变化时触发
       - 'rules/**/*.txt'
       - 'rules/**/*.yaml'
   workflow_dispatch:
@@ -24,11 +23,29 @@ jobs:
           gunzip mihomo.gz
           chmod +x mihomo
 
-      - name: Compile all source rule files
+      - name: Create a dummy config file
+        run: echo "" > dummy-config.yaml
+
+      - name: Convert .txt and .yaml files to .mrs
         run: |
           shopt -s globstar
+          
           for file in rules/**/*.{txt,yaml}; do
             [ -e "$file" ] || continue
+
+            TYPE=""
+            if [[ "$file" == *"-ipcidr"* ]]; then
+              TYPE="ipcidr"
+            else
+              TYPE="domain"
+            fi
+            
+            FORMAT=""
+            if [[ "$file" == *".yaml" ]]; then
+              FORMAT="yaml"
+            else
+              FORMAT="text"
+            fi
 
             relative_path="${file#rules/}"
             parent_dir=$(dirname "$relative_path")
@@ -40,9 +57,9 @@ jobs:
             
             mkdir -p "$target_dir"
             
-            echo "Compiling '$file' -> '$output_file'"
-            # 关键修改：使用 timeout 命令强制在10秒后结束mihomo进程
-            timeout 10s ./mihomo rule-set compile "$file" -o "$output_file"
+            echo "Converting '$file' -> '$output_file'"
+            # 关键修改：正确的命令 + “安静模式”参数
+            ./mihomo convert-ruleset "$TYPE" "$FORMAT" "$file" "$output_file" -c dummy-config.yaml
           done
 
       - name: Commit and push compiled files
