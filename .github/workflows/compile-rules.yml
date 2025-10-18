@@ -23,29 +23,55 @@ jobs:
           gunzip mihomo.gz
           chmod +x mihomo
 
-      - name: Create a dummy config file
+      - name: Create a minimal dummy config file
         run: |
-          cat > dummy-config.yaml << EOF
+          cat > dummy-config.yaml <<'EOF'
           mixed-port: 7890
           allow-lan: false
           mode: rule
           log-level: info
           EOF
+          echo "dummy-config.yaml content:"
+          cat dummy-config.yaml
 
-      - name: Convert .txt and .yaml files to .mrs
+      - name: Show mihomo info / help (diagnostic)
         run: |
+          ./mihomo --version || true
+          ./mihomo convert-ruleset --help || ./mihomo --help || true
+
+      - name: Convert .txt and .yaml files to .mrs (with timeout + diagnostics)
+        run: |
+          set -euo pipefail
           shopt -s globstar nullglob
-          
-          for file in rules/**/*.{txt,yaml}; do
-            TYPE=""
+
+          # collect files
+          files=(rules/**/*.{txt,yaml})
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No rule files found under rules/ — nothing to do."
+            exit 0
+          fi
+
+          # Do a quick single-file dry-run on the first file to detect hangs/errors early
+          first="${files[0]}"
+          echo "Dry-run converting single file (timeout 60s) : $first"
+          mkdir -p /tmp/mihomo_test_out
+          if ! timeout 60s ./mihomo convert-ruleset "$(basename "$first")" "$(echo "$first" | awk -F. '{print $NF}')" "$first" "/tmp/mihomo_test_out/$(basename "$first").mrs" -c dummy-config.yaml; then
+            echo "Dry-run failed or timed out. Printing sample logs and aborting before bulk run."
+            ps aux | grep mihomo || true
+            ls -la /tmp || true
+            exit 1
+          fi
+          echo "Dry-run succeeded, proceeding to bulk conversion..."
+
+          for file in "${files[@]}"; do
             if [[ "$file" == *"-ipcidr"* ]]; then
               TYPE="ipcidr"
             else
               TYPE="domain"
             fi
-            
-            FORMAT=""
-            if [[ "$file" == *".yaml" ]]; then
+
+            ext="${file##*.}"
+            if [[ "$ext" == "yaml" ]]; then
               FORMAT="yaml"
             else
               FORMAT="text"
@@ -54,15 +80,18 @@ jobs:
             relative_path="${file#rules/}"
             parent_dir=$(dirname "$relative_path")
             target_dir="compiled_rules/$parent_dir"
-            
             filename=$(basename "$relative_path")
             filename_no_ext="${filename%.*}"
             output_file="$target_dir/$filename_no_ext.mrs"
-            
+
             mkdir -p "$target_dir"
-            
-            echo "Converting '$file' -> '$output_file'"
-            ./mihomo -d . convert-ruleset "$TYPE" "$FORMAT" "$file" "$output_file"
+            echo "Converting '$file' -> '$output_file' (type=$TYPE format=$FORMAT)"
+
+            # timeout prevents long-running server mode from hanging the job
+            if ! timeout 120s ./mihomo convert-ruleset "$TYPE" "$FORMAT" "$file" "$output_file" -c dummy-config.yaml; then
+              echo "Conversion failed or timed out for: $file"
+              exit 1
+            fi
           done
 
       - name: Commit and push compiled files
