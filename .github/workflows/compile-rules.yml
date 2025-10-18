@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      # 只在 .txt 文件发生变化时触发
+      # 只在 .txt 或 .yaml 文件发生变化时触发
       - 'rules/**/*.txt'
+      - 'rules/**/*.yaml'
   workflow_dispatch:
 
 jobs:
@@ -23,19 +24,25 @@ jobs:
           gunzip mihomo.gz
           chmod +x mihomo
 
-      - name: Compile .txt files
+      - name: Compile all source rule files
         run: |
           shopt -s globstar
-          for file in rules/**/*.txt; do
+          for file in rules/**/*.{txt,yaml}; do
             [ -e "$file" ] || continue
+
             relative_path="${file#rules/}"
-            target_dir="compiled_rules/$(dirname "$relative_path")"
-            filename_no_ext="${file##*/}"
-            filename_no_ext="${filename_no_ext%.*}"
+            parent_dir=$(dirname "$relative_path")
+            target_dir="compiled_rules/$parent_dir"
+            
+            filename=$(basename "$relative_path")
+            filename_no_ext="${filename%.*}"
             output_file="$target_dir/$filename_no_ext.mrs"
+            
             mkdir -p "$target_dir"
+            
             echo "Compiling '$file' -> '$output_file'"
-            ./mihomo rule-set compile "$file" -o "$output_file"
+            # 关键修改：使用 timeout 命令强制在10秒后结束mihomo进程
+            timeout 10s ./mihomo rule-set compile "$file" -o "$output_file"
           done
 
       - name: Commit and push compiled files
