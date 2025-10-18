@@ -24,15 +24,19 @@ jobs:
           chmod +x mihomo
 
       - name: Create a dummy config file
-        run: echo "" > dummy-config.yaml
+        run: |
+          cat > dummy-config.yaml << EOF
+          mixed-port: 7890
+          allow-lan: false
+          mode: rule
+          log-level: info
+          EOF
 
       - name: Convert .txt and .yaml files to .mrs
         run: |
-          shopt -s globstar
+          shopt -s globstar nullglob
           
           for file in rules/**/*.{txt,yaml}; do
-            [ -e "$file" ] || continue
-
             TYPE=""
             if [[ "$file" == *"-ipcidr"* ]]; then
               TYPE="ipcidr"
@@ -58,8 +62,7 @@ jobs:
             mkdir -p "$target_dir"
             
             echo "Converting '$file' -> '$output_file'"
-            # 关键修改：正确的命令 + “安静模式”参数
-            ./mihomo convert-ruleset "$TYPE" "$FORMAT" "$file" "$output_file" -c dummy-config.yaml
+            ./mihomo -d . convert-ruleset "$TYPE" "$FORMAT" "$file" "$output_file"
           done
 
       - name: Commit and push compiled files
