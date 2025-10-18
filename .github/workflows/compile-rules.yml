@@ -5,8 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'rules/**'
-  workflow_dispatch:
+      # 只在 .txt 或 .yaml 文件发生变化时触发
+      - 'rules/**/*.txt'
+      - 'rules/**/*.yaml'
+  workflow_dispatch: # 同时也允许手动触发
 
 jobs:
   build:
@@ -23,10 +25,11 @@ jobs:
           chmod +x mihomo
           echo "Mihomo core (Stable Version) downloaded and ready."
 
-      # --- 这是最终修正版的脚本 ---
-      - name: Compile all rule files
+      # --- 这是最关键的修改部分 ---
+      - name: Compile only .txt and .yaml files
         run: |
-          find rules -type f | while read -r file; do
+          # 使用 find 命令，并精确筛选出 .txt 和 .yaml 文件
+          find rules -type f \( -name "*.txt" -o -name "*.yaml" \) | while read -r file; do
             relative_path="${file#rules/}"
             parent_dir=$(dirname "$relative_path")
             target_dir="compiled_rules/$parent_dir"
