@@ -24,15 +24,15 @@ jobs:
           chmod +x mihomo
           echo "Mihomo core (Stable Version) downloaded and ready."
 
-      # --- 这是全新的、釜底抽薪的解决方案 ---
-      - name: Compile all rule files using globstar
+      # --- 这是最关键的修改部分 ---
+      - name: Create a dummy config file
+        run: echo "" > dummy-config.yaml
+
+      - name: Compile only .txt and .yaml files
         run: |
-          # 启用 globstar 功能，允许 ** 递归匹配
           shopt -s globstar
           
-          # 直接遍历所有匹配到的 .txt 和 .yaml 文件
           for file in rules/**/*.{txt,yaml}; do
-            # 检查文件是否存在，以防万一 rules 目录为空
             [ -e "$file" ] || continue
 
             relative_path="${file#rules/}"
@@ -46,8 +46,8 @@ jobs:
             mkdir -p "$target_dir"
             
             echo "Compiling '$file' -> '$output_file'"
-            # 同样保留 < /dev/null 以确保万无一失
-            ./mihomo rule-set compile "$file" -o "$output_file" < /dev/null
+            # 关键修改：使用 -c 参数指定一个空配置文件，阻止其启动完整服务
+            ./mihomo rule-set compile "$file" -o "$output_file" -c dummy-config.yaml
           done
 
       - name: Commit and push compiled files
