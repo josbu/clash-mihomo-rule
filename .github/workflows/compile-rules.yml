@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
+      # 只在 .txt 文件发生变化时触发
       - 'rules/**/*.txt'
-      - 'rules/**/*.yaml'
   workflow_dispatch:
 
 jobs:
@@ -17,37 +17,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download Mihomo Core (Stable Version)
+      - name: Download Mihomo Core
         run: |
           wget -O mihomo.gz "https://github.com/MetaCubeX/mihomo/releases/download/v1.18.1/mihomo-linux-amd64-v1.18.1.gz"
           gunzip mihomo.gz
           chmod +x mihomo
-          echo "Mihomo core (Stable Version) downloaded and ready."
 
-      # --- 这是最关键的修改部分 ---
-      - name: Create a dummy config file
-        run: echo "" > dummy-config.yaml
-
-      - name: Compile only .txt and .yaml files
+      - name: Compile .txt files
         run: |
           shopt -s globstar
-          
-          for file in rules/**/*.{txt,yaml}; do
+          for file in rules/**/*.txt; do
             [ -e "$file" ] || continue
-
             relative_path="${file#rules/}"
-            parent_dir=$(dirname "$relative_path")
-            target_dir="compiled_rules/$parent_dir"
-            
-            filename=$(basename "$relative_path")
-            filename_no_ext="${filename%.*}"
+            target_dir="compiled_rules/$(dirname "$relative_path")"
+            filename_no_ext="${file##*/}"
+            filename_no_ext="${filename_no_ext%.*}"
             output_file="$target_dir/$filename_no_ext.mrs"
-            
             mkdir -p "$target_dir"
-            
             echo "Compiling '$file' -> '$output_file'"
-            # 关键修改：使用 -c 参数指定一个空配置文件，阻止其启动完整服务
-            ./mihomo rule-set compile "$file" -o "$output_file" -c dummy-config.yaml
+            ./mihomo rule-set compile "$file" -o "$output_file"
           done
 
       - name: Commit and push compiled files
@@ -55,6 +43,3 @@ jobs:
         with:
           commit_message: "chore: Auto-compile MRS rule sets"
           file_pattern: 'compiled_rules/**'
-          commit_user_name: "GitHub Actions Bot"
-          commit_user_email: "actions@github.com"
-          commit_author: "GitHub Actions Bot <actions@github.com>"
