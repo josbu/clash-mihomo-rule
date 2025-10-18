@@ -5,10 +5,9 @@ on:
     branches:
       - main
     paths:
-      # 只在 .txt 或 .yaml 文件发生变化时触发
       - 'rules/**/*.txt'
       - 'rules/**/*.yaml'
-  workflow_dispatch: # 同时也允许手动触发
+  workflow_dispatch:
 
 jobs:
   build:
@@ -28,7 +27,6 @@ jobs:
       # --- 这是最关键的修改部分 ---
       - name: Compile only .txt and .yaml files
         run: |
-          # 使用 find 命令，并精确筛选出 .txt 和 .yaml 文件
           find rules -type f \( -name "*.txt" -o -name "*.yaml" \) | while read -r file; do
             relative_path="${file#rules/}"
             parent_dir=$(dirname "$relative_path")
@@ -41,7 +39,8 @@ jobs:
             mkdir -p "$target_dir"
             
             echo "Compiling '$file' -> '$output_file'"
-            ./mihomo rule-set compile "$file" -o "$output_file"
+            # 关键修改：在命令末尾加上 < /dev/null
+            ./mihomo rule-set compile "$file" -o "$output_file" < /dev/null
           done
 
       - name: Commit and push compiled files
