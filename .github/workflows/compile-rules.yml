@@ -16,17 +16,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- 这是新增的修正步骤 ---
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Download Mihomo Core
+      # --- 这是最关键的修改 ---
+      - name: Download Mihomo Core (Stable Version)
         run: |
-          MIHOMO_URL=$(curl -s "https://api.github.com/repos/MetaCubeX/mihomo/releases" | jq -r '.[0].assets[] | select(.name | contains("linux-amd64-alpha")) | .browser_download_url')
-          wget -O mihomo.gz "$MIHOMO_URL"
+          # 我们不再使用API查询，而是直接下载一个可靠的正式版
+          wget -O mihomo.gz "https://github.com/MetaCubeX/mihomo/releases/download/v1.18.1/mihomo-linux-amd64-v1.18.1.gz"
           gunzip mihomo.gz
           chmod +x mihomo
-          echo "Mihomo core downloaded and ready."
+          echo "Mihomo core (Stable Version) downloaded and ready."
 
       - name: Create compiled rules directory
         run: mkdir -p compiled_rules
