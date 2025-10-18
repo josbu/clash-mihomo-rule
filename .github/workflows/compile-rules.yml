@@ -1,58 +1,53 @@
 name: Compile MRS Rule Sets
 
-# 触发条件：当 rules 文件夹下的任何文件发生变化，并被推送到 main 分支时，此工作流将被触发。
 on:
   push:
     branches:
       - main
     paths:
       - 'rules/**'
-  workflow_dispatch: # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # 使用最新的Ubuntu环境
+    runs-on: ubuntu-latest
 
     steps:
-      # 第一步：检出您的仓库代码
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 第二步：下载Mihomo核心程序作为编译器
+      # --- 这是新增的修正步骤 ---
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Download Mihomo Core
         run: |
-          # 从GitHub API获取最新alpha版本的下载链接
           MIHOMO_URL=$(curl -s "https://api.github.com/repos/MetaCubeX/mihomo/releases" | jq -r '.[0].assets[] | select(.name | contains("linux-amd64-alpha")) | .browser_download_url')
           wget -O mihomo.gz "$MIHOMO_URL"
           gunzip mihomo.gz
           chmod +x mihomo
           echo "Mihomo core downloaded and ready."
 
-      # 第三步：创建用于存放编译后文件的目录
       - name: Create compiled rules directory
         run: mkdir -p compiled_rules
 
-      # 第四步：循环遍历rules文件夹下的所有文件，并进行编译
       - name: Compile all rule files
         run: |
           for file in rules/*; do
             if [ -f "$file" ]; then
-              # 获取不带扩展名的文件名
               filename=$(basename -- "$file")
               filename_no_ext="${filename%.*}"
               
               echo "Compiling $file -> compiled_rules/${filename_no_ext}.mrs"
-              # 执行编译命令
               ./mihomo rule-set compile "$file" -o "compiled_rules/${filename_no_ext}.mrs"
             fi
           done
 
-      # 第五步：自动将新生成的 .mrs 文件提交回您的仓库
       - name: Commit and push compiled files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: Auto-compile MRS rule sets"
-          file_pattern: 'compiled_rules/*.mrs' # 只提交 compiled_rules 文件夹下的 .mrs 文件
+          file_pattern: 'compiled_rules/*.mrs'
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Actions Bot <actions@github.com>"
