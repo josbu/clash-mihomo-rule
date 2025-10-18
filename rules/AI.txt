@@ -1,16 +1,8 @@
-# NAME: China
-# AUTHOR: YYDS666
-# UPDATED: 2025-10-18 02:19:24
-# TOTAL: 5714
-+.00cdn.com
-+.0123456789.com
-+.0379home.com
-+.055110.com
-+.05sun.com
-+.0759job.com
-+.10010.com
-+.100bt.com
-+.100offer.com
-+.100tal.com
-+.11467.com
-+.114blog.com
+# 开头是 OpenAI Bard anthropic
+# 知名大模型
+openai
+anthropic
+claude
+# 知名应用
+.perplexity.ai
+.chatgpt.com
