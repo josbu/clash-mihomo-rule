@@ -42,7 +42,8 @@ jobs:
       - name: Show mihomo info / help (diagnostic)
         run: |
           ./mihomo --version || true
-          ./mihomo convert-ruleset --help || ./mihomo --help || true
+          # --- FIX: Add timeout to help commands to prevent hanging ---
+          timeout 30s ./mihomo convert-ruleset --help || timeout 30s ./mihomo --help || true
 
       - name: Convert .txt and .yaml files to .mrs (with timeout + diagnostics)
         run: |
@@ -59,18 +60,30 @@ jobs:
           # Do a quick single-file dry-run on the first file to detect hangs/errors early
           first="${files[0]}"
           echo "Dry-run converting single file (timeout 60s) : $first"
+          
+          # --- FIX: Correct dry-run logic to match main loop ---
+          if [[ "$first" == *"-ipcidr"* ]]; then
+            DRY_RUN_TYPE="ipcidr"
+          else
+            DRY_RUN_TYPE="domain"
+          fi
+          
+          dry_run_ext="${first##*.}"
+          if [[ "$dry_run_ext" == "yaml" ]]; then
+            DRY_RUN_FORMAT="yaml"
+          else
+            DRY_RUN_FORMAT="text"
+          fi
+
           mkdir -p /tmp/mihomo_test_out
-          # Note: The dry-run logic seems to have a slight mismatch with the main loop's logic (TYPE vs. basename, FORMAT vs. extension).
-          # This simpler dry-run just checks if mihomo can be invoked at all.
-          # A more accurate dry-run would mirror the main loop's TYPE/FORMAT logic.
-          # For now, we'll keep your original dry-run.
-          if ! timeout 60s ./mihomo convert-ruleset "$(basename "$first")" "$(echo "$first" | awk -F. '{print $NF}')" "$first" "/tmp/mihomo_test_out/$(basename "$first").mrs" -c dummy-config.yaml; then
+          if ! timeout 60s ./mihomo convert-ruleset "$DRY_RUN_TYPE" "$DRY_RUN_FORMAT" "$first" "/tmp/mihomo_test_out/$(basename "$first").mrs" -c dummy-config.yaml; then
             echo "Dry-run failed or timed out. Printing sample logs and aborting before bulk run."
             ps aux | grep mihomo || true
             ls -la /tmp || true
             exit 1
           fi
           echo "Dry-run succeeded, proceeding to bulk conversion..."
+          # --- End of dry-run fix ---
 
           for file in "${files[@]}"; do
             if [[ "$file" == *"-ipcidr"* ]]; then
@@ -115,3 +128,4 @@ jobs:
           # --- IMPROVEMENT: Add commit user details ---
           commit_user_name: github-actions[bot]
           commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+
