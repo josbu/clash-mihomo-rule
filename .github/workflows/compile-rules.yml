@@ -12,6 +12,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # --- FIX: Add permissions block ---
+    # This grants the job permission to write back to the repository
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -55,6 +60,10 @@ jobs:
           first="${files[0]}"
           echo "Dry-run converting single file (timeout 60s) : $first"
           mkdir -p /tmp/mihomo_test_out
+          # Note: The dry-run logic seems to have a slight mismatch with the main loop's logic (TYPE vs. basename, FORMAT vs. extension).
+          # This simpler dry-run just checks if mihomo can be invoked at all.
+          # A more accurate dry-run would mirror the main loop's TYPE/FORMAT logic.
+          # For now, we'll keep your original dry-run.
           if ! timeout 60s ./mihomo convert-ruleset "$(basename "$first")" "$(echo "$first" | awk -F. '{print $NF}')" "$first" "/tmp/mihomo_test_out/$(basename "$first").mrs" -c dummy-config.yaml; then
             echo "Dry-run failed or timed out. Printing sample logs and aborting before bulk run."
             ps aux | grep mihomo || true
@@ -98,4 +107,11 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: Auto-compile MRS rule sets"
-          file_pattern: 'compiled_rules/**'
+          
+          # --- IMPROVEMENT: Use the directory path ---
+          # This will add all new, modified, or deleted files within the compiled_rules/ directory
+          file_pattern: 'compiled_rules/'
+          
+          # --- IMPROVEMENT: Add commit user details ---
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
