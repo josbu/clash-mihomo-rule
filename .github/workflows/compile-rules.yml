@@ -39,13 +39,13 @@ jobs:
           echo "dummy-config.yaml content:"
           cat dummy-config.yaml
 
-      - name: Show mihomo info / help (diagnostic)
-        run: |
-          ./mihomo --version || true
-          # --- FIX: Add timeout to help commands to prevent hanging ---
-          timeout 30s ./mihomo convert-ruleset --help || timeout 30s ./mihomo --help || true
+      # --- REMOVED: Diagnostic step that was hanging ---
+      # - name: Show mihomo info / help (diagnostic)
+      #   run: |
+      #     ./mihomo --version || true
+      #     timeout 30s ./mihomo convert-ruleset --help || timeout 30s ./mihomo --help || true
 
-      - name: Convert .txt and .yaml files to .mrs (with timeout + diagnostics)
+      - name: Convert .txt and .yaml files to .mrs
         run: |
           set -euo pipefail
           shopt -s globstar nullglob
@@ -57,34 +57,9 @@ jobs:
             exit 0
           fi
 
-          # Do a quick single-file dry-run on the first file to detect hangs/errors early
-          first="${files[0]}"
-          echo "Dry-run converting single file (timeout 60s) : $first"
-          
-          # --- FIX: Correct dry-run logic to match main loop ---
-          if [[ "$first" == *"-ipcidr"* ]]; then
-            DRY_RUN_TYPE="ipcidr"
-          else
-            DRY_RUN_TYPE="domain"
-          fi
-          
-          dry_run_ext="${first##*.}"
-          if [[ "$dry_run_ext" == "yaml" ]]; then
-            DRY_RUN_FORMAT="yaml"
-          else
-            DRY_RUN_FORMAT="text"
-          fi
+          # --- REMOVED: Dry-run logic as requested ---
 
-          mkdir -p /tmp/mihomo_test_out
-          if ! timeout 60s ./mihomo convert-ruleset "$DRY_RUN_TYPE" "$DRY_RUN_FORMAT" "$first" "/tmp/mihomo_test_out/$(basename "$first").mrs" -c dummy-config.yaml; then
-            echo "Dry-run failed or timed out. Printing sample logs and aborting before bulk run."
-            ps aux | grep mihomo || true
-            ls -la /tmp || true
-            exit 1
-          fi
-          echo "Dry-run succeeded, proceeding to bulk conversion..."
-          # --- End of dry-run fix ---
-
+          echo "Proceeding directly to bulk conversion..."
           for file in "${files[@]}"; do
             if [[ "$file" == *"-ipcidr"* ]]; then
               TYPE="ipcidr"
