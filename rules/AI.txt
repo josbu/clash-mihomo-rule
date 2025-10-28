@@ -1,8 +1,0 @@
-# 开头是 OpenAI Bard anthropic
-# 知名大模型
-openai
-anthropic
-claude
-# 知名应用
-.perplexity.ai
-.chatgpt.com
