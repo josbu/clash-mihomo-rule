@@ -9,6 +9,7 @@ payload:
 - DOMAIN-SUFFIX,oplist.org
 - DOMAIN-SUFFIX,bing.com
 - DOMAIN-SUFFIX,wpurl.cc
+- DOMAIN-SUFFIX,elayce.com
 
 
 # 域名关键字匹配
