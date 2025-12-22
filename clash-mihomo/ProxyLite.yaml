@@ -2,6 +2,7 @@ payload:
 # 域名匹配（去重版）
 - DOMAIN-SUFFIX,amazon.com
 - DOMAIN-SUFFIX,amazon.co.uk
+- DOMAIN-SUFFIX,elayce.com
 - DOMAIN-SUFFIX,amazon.de
 - DOMAIN-SUFFIX,6bcloud.top
 - DOMAIN-SUFFIX,viptwo.top
