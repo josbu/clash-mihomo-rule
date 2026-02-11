@@ -1,105 +1,40 @@
-name: Compile MRS Rule Sets
-
+name: Convert TXT to MRS
 on:
   push:
-    branches:
-      - main
     paths:
-      - 'rules/**/*.txt'
-      - 'rules/**/*.yaml'
-  workflow_dispatch:
+      - '**.txt' # 只要你有任何 .txt 文件更新，机器人就开工
+  workflow_dispatch: # 也允许你手动点击运行
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    # --- FIX: Add permissions block ---
-    # This grants the job permission to write back to the repository
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Mihomo Core
+      - name: Download Mihomo Tool
         run: |
-          wget -O mihomo.gz "https://github.com/MetaCubeX/mihomo/releases/download/v1.18.1/mihomo-linux-amd64-v1.18.1.gz"
-          gunzip mihomo.gz
+          # 下载最新的 Mihomo 内核用来转换文件
+          curl -L -o mihomo.tar.gz https://github.com/MetaCubeX/mihomo/releases/download/v1.18.9/mihomo-linux-amd64-v1.18.9.gz
+          gunzip mihomo.tar.gz
+          mv mihomo-linux-amd64-v1.18.9 mihomo
           chmod +x mihomo
 
-      - name: Create a minimal dummy config file
+      - name: Convert TXT to MRS
         run: |
-          cat > dummy-config.yaml <<'EOF'
-          mixed-port: 7890
-          allow-lan: false
-          mode: rule
-          log-level: info
-          EOF
-          echo "dummy-config.yaml content:"
-          cat dummy-config.yaml
-
-      # --- REMOVED: Diagnostic step that was hanging ---
-      # - name: Show mihomo info / help (diagnostic)
-      #   run: |
-      #     ./mihomo --version || true
-      #     timeout 30s ./mihomo convert-ruleset --help || timeout 30s ./mihomo --help || true
-
-      - name: Convert .txt and .yaml files to .mrs
-        run: |
-          set -euo pipefail
-          shopt -s globstar nullglob
-
-          # collect files
-          files=(rules/**/*.{txt,yaml})
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No rule files found under rules/ — nothing to do."
-            exit 0
-          fi
-
-          # --- REMOVED: Dry-run logic as requested ---
-
-          echo "Proceeding directly to bulk conversion..."
-          for file in "${files[@]}"; do
-            if [[ "$file" == *"-ipcidr"* ]]; then
-              TYPE="ipcidr"
-            else
-              TYPE="domain"
-            fi
-
-            ext="${file##*.}"
-            if [[ "$ext" == "yaml" ]]; then
-              FORMAT="yaml"
-            else
-              FORMAT="text"
-            fi
-
-            relative_path="${file#rules/}"
-            parent_dir=$(dirname "$relative_path")
-            target_dir="compiled_rules/$parent_dir"
-            filename=$(basename "$relative_path")
-            filename_no_ext="${filename%.*}"
-            output_file="$target_dir/$filename_no_ext.mrs"
-
-            mkdir -p "$target_dir"
-            echo "Converting '$file' -> '$output_file' (type=$TYPE format=$FORMAT)"
-
-            # timeout prevents long-running server mode from hanging the job
-            if ! timeout 120s ./mihomo convert-ruleset "$TYPE" "$FORMAT" "$file" "$output_file" -c dummy-config.yaml; then
-              echo "Conversion failed or timed out for: $file"
-              exit 1
+          # 自动寻找所有 .txt 文件并转换
+          # 你可以修改这里来指定特定的文件夹，比如 domain/*.txt
+          for file in *.txt; do
+            if [ -f "$file" ]; then
+              filename="${file%.*}"
+              ./mihomo rule-set compile "$file" -o "${filename}.mrs"
             fi
           done
 
-      - name: Commit and push compiled files
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: Auto-compile MRS rule sets"
-          
-          # --- IMPROVEMENT: Use the directory path ---
-          # This will add all new, modified, or deleted files within the compiled_rules/ directory
-          file_pattern: 'compiled_rules/'
-          
-          # --- IMPROVEMENT: Add commit user details ---
-          commit_user_name: github-actions[bot]
-          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add *.mrs
+          git commit -m "Auto-convert TXT to MRS" || exit 0
+          git push
