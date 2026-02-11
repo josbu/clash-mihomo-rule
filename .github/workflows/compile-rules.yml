@@ -14,23 +14,24 @@ jobs:
 
       - name: Download Mihomo Tool
         run: |
-          # 直接下载你指定的链接，存为 mihomo.gz
-          curl -L -o mihomo.gz https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-v2-v1.19.20.gz
-          # 解压
-          gunzip mihomo.gz
-          # 无论解压后叫什么，直接强制改名为 mihomo
-          mv mihomo-linux-amd64* mihomo
-          # 给执行权限
+          # 1. 下载并直接解压到标准输出，然后重定向保存为 mihomo
+          # 这样可以彻底避免解压后文件名对不上的问题
+          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-v2-v1.19.20.gz | gunzip > mihomo
+          
+          # 2. 赋予执行权限
           chmod +x mihomo
+          
+          # 验证文件是否存在（调试用）
+          ls -l mihomo
 
       - name: Convert TXT to MRS
         run: |
-          # 遍历所有文件夹下的 .txt 文件进行编译
+          # 遍历所有文件夹寻找 txt
           find . -name "*.txt" | while read file; do
-            # 排除掉可能存在的临时文件或说明文件
             if [ -f "$file" ]; then
               filename="${file%.*}"
-              echo "正在处理: $file"
+              echo "正在转换: $file"
+              # 调用本地的 ./mihomo 工具
               ./mihomo rule-set compile "$file" -o "${filename}.mrs"
             fi
           done
@@ -40,13 +41,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 强制添加仓库中所有的 .mrs 文件
+          # 添加所有新生成的 mrs
           git add **/*.mrs
           
-          # 检查是否有内容需要提交
           if git diff --staged --quiet; then
-            echo "没有发现新生成的 MRS 文件，跳过提交。"
+            echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-convert TXT to MRS using v1.19.20"
+            git commit -m "Auto-convert TXT to MRS"
             git push
           fi
