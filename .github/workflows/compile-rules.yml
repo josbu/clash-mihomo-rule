@@ -2,8 +2,8 @@ name: Convert TXT to MRS
 on:
   push:
     paths:
-      - '**.txt' # 只要你有任何 .txt 文件更新，机器人就开工
-  workflow_dispatch: # 也允许你手动点击运行
+      - '**.txt'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,27 +14,33 @@ jobs:
 
       - name: Download Mihomo Tool
         run: |
-          # 下载最新的 Mihomo 内核用来转换文件
-          curl -L -o mihomo.tar.gz https://github.com/MetaCubeX/mihomo/releases/download/v1.18.9/mihomo-linux-amd64-v1.18.9.gz
-          gunzip mihomo.tar.gz
-          mv mihomo-linux-amd64-v1.18.9 mihomo
+          # 修正：直接下载并解压，使用通配符匹配文件名
+          curl -L -o mihomo.gz https://github.com/MetaCubeX/mihomo/releases/download/v1.18.9/mihomo-linux-amd64-v1.18.9.gz
+          gunzip mihomo.gz
+          # 找到那个解压出来的长文件名文件，统一改名为 mihomo
+          mv mihomo-linux-amd64* mihomo
           chmod +x mihomo
 
       - name: Convert TXT to MRS
         run: |
-          # 自动寻找所有 .txt 文件并转换
-          # 你可以修改这里来指定特定的文件夹，比如 domain/*.txt
-          for file in *.txt; do
-            if [ -f "$file" ]; then
-              filename="${file%.*}"
-              ./mihomo rule-set compile "$file" -o "${filename}.mrs"
-            fi
+          # 自动寻找所有文件夹（包括 domain, ip 等）下的 .txt 文件
+          # 并将生成的 .mrs 放在同一个文件夹里
+          find . -name "*.txt" | while read file; do
+            filename="${file%.*}"
+            echo "正在转换: $file"
+            ./mihomo rule-set compile "$file" -o "${filename}.mrs"
           done
 
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add *.mrs
-          git commit -m "Auto-convert TXT to MRS" || exit 0
-          git push
+          # 添加所有新生成的 mrs 文件
+          git add **/*.mrs
+          # 只有在有变化时才提交，防止报错
+          if git diff --staged --quiet; then
+            echo "没有发现变化，跳过提交。"
+          else
+            git commit -m "Auto-convert TXT to MRS"
+            git push
+          fi
