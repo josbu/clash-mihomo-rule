@@ -1,8 +1,8 @@
-name: Convert TXT to MRS
+name: Convert YAML to MRS
 on:
   push:
     paths:
-      - '**.txt'
+      - 'rules/**.yaml' # 仅当 rules 文件夹下的 yaml 变动时触发
   workflow_dispatch:
 
 jobs:
@@ -14,24 +14,20 @@ jobs:
 
       - name: Download Mihomo Tool
         run: |
-          # 1. 下载并直接解压到标准输出，然后重定向保存为 mihomo
-          # 这样可以彻底避免解压后文件名对不上的问题
+          # 锁定你要求的 v1.19.20 版本并直接保存为 mihomo
           curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-v2-v1.19.20.gz | gunzip > mihomo
-          
-          # 2. 赋予执行权限
           chmod +x mihomo
-          
-          # 验证文件是否存在（调试用）
-          ls -l mihomo
 
-      - name: Convert TXT to MRS
+      - name: Convert YAML to MRS
         run: |
-          # 遍历所有文件夹寻找 txt
-          find . -name "*.txt" | while read file; do
+          # 专门去 rules 文件夹下寻找所有的 .yaml 文件
+          # 排除掉特殊的 README 或其他非规则文件
+          find rules/ -name "*.yaml" | while read file; do
             if [ -f "$file" ]; then
+              # 获取文件名（不含扩展名）
               filename="${file%.*}"
-              echo "正在转换: $file"
-              # 调用本地的 ./mihomo 工具
+              echo "正在处理: $file"
+              # 编译并将结果放在同一个目录下
               ./mihomo rule-set compile "$file" -o "${filename}.mrs"
             fi
           done
@@ -41,12 +37,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 添加所有新生成的 mrs
-          git add **/*.mrs
+          # 关键：添加 rules 文件夹下的所有 mrs 文件
+          git add rules/*.mrs
           
           if git diff --staged --quiet; then
-            echo "没有变化，跳过提交。"
+            echo "没有发现新生成的 MRS 文件，跳过提交。"
           else
-            git commit -m "Auto-convert TXT to MRS"
+            git commit -m "Auto-convert YAML to MRS in rules/"
             git push
           fi
