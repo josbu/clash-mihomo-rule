@@ -1,8 +1,8 @@
-name: Convert YAML to MRS
+name: Convert TXT to MRS
 on:
   push:
     paths:
-      - 'rules/**.yaml'
+      - 'rules/**.txt' # 监听 txt 文件的变动
   workflow_dispatch:
 
 jobs:
@@ -18,16 +18,16 @@ jobs:
           curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
           chmod +x mihomo
 
-      - name: Convert YAML to MRS
+      - name: Convert TXT to MRS
         run: |
-          # 2. 遍历 rules 目录下所有的 yaml 文件，自动转换为 mrs
-          find rules/ -name "*.yaml" | while read file; do
+          # 2. 遍历 rules 目录下所有的 txt 文件，自动转换为 mrs
+          find rules/ -name "*.txt" | while read file; do
             if [ -f "$file" ]; then
               filename="${file%.*}"
               echo "正在转换: $file -> ${filename}.mrs"
               
-              # Mihomo 官方转换命令
-              ./mihomo convert-ruleset classical yaml "$file" "${filename}.mrs"
+              # 注意这里：格式参数从 yaml 换成了 text
+              ./mihomo convert-ruleset classical text "$file" "${filename}.mrs"
             fi
           done
 
@@ -42,6 +42,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-convert YAML to MRS via Mihomo CLI"
+            git commit -m "Auto-convert TXT to MRS"
             git push
           fi
