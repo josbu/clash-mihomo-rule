@@ -12,36 +12,70 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
       - name: Download Mihomo
         run: |
-          # 下载并安装内核
           curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
           chmod +x mihomo
 
-      - name: Auto-Fix Format and Convert to MRS
+      - name: Auto-Heal and Convert
         run: |
-          # 遍历 rules 目录下所有的 yaml 文件
+          # 注入 Python 智能清洗脚本
+          cat << 'EOF' > healer.py
+          import sys
+          import yaml
+
+          file_path = sys.argv[1]
+          try:
+              with open(file_path, 'r', encoding='utf-8') as f:
+                  data = yaml.safe_load(f)
+          except Exception as e:
+              print(f"⚠️ YAML 解析跳过 {file_path}: {e}")
+              sys.exit(0)
+
+          if not data or 'payload' not in data or not isinstance(data['payload'], list):
+              sys.exit(0)
+
+          new_payload = []
+          for rule in data['payload']:
+              if not isinstance(rule, str):
+                  continue
+              rule = rule.strip()
+              if not rule:
+                  continue
+              
+              # 自动修复旧版 +. 语法
+              if rule.startswith('+.'):
+                  rule = 'DOMAIN-SUFFIX,' + rule[2:]
+              
+              # 自动修复没有逗号的孤儿域名 (排除 MATCH)
+              if ',' not in rule and rule != 'MATCH':
+                  rule = 'DOMAIN,' + rule
+                  
+              new_payload.append(rule)
+
+          data['payload'] = new_payload
+          with open(file_path, 'w', encoding='utf-8') as f:
+              yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+          EOF
+
+          # 遍历并处理所有 YAML 文件
           find rules/ -name "*.yaml" | while read file; do
             if [ -f "$file" ]; then
               filename="${file%.*}"
               echo "====================================="
-              echo "🔧 正在处理: $file"
+              echo "🛡️ 正在智能清洗: $file"
+              python3 healer.py "$file"
               
-              # 【核心修复 1】: 强制修复缩进！把所有顶格的 "- " 替换为 "  - " (前面加两个空格)
-              # 这样就完美符合了 YAML 的严格缩进规范，杜绝空指针崩溃
-              sed -i 's/^- /  - /g' "$file"
-              
-              # 【核心修复 2】: 如果文件第一行不是 payload:，自动在最前面补上
-              if ! grep -q "^payload:" "$file"; then
-                sed -i '1s/^/payload:\n/' "$file"
-              fi
-              
-              echo "✅ 修复后的格式预览 (前3行):"
-              head -n 3 "$file"
-              
-              # 喂给内核进行转换
+              echo "✅ 清洗完成，喂给内核转换..."
               ./mihomo convert-ruleset classical yaml "$file" "${filename}.mrs"
-              echo "🎉 $file 转换成功！"
             fi
           done
 
@@ -51,10 +85,12 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           git add rules/*.mrs
+          # 同时也把你被修复好的 yaml 源码推送到仓库，方便你以后查看
+          git add rules/*.yaml 
           
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-fix YAML indentation and convert to MRS"
+            git commit -m "Auto-heal rules and convert to MRS"
             git push
           fi
