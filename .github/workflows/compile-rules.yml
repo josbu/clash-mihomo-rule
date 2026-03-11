@@ -2,7 +2,7 @@ name: Convert TXT to MRS
 on:
   push:
     paths:
-      - 'rules/**.txt' # 监听 txt 文件的变动
+      - 'rules/**.txt'
   workflow_dispatch:
 
 jobs:
@@ -14,26 +14,32 @@ jobs:
 
       - name: Download Mihomo
         run: |
-          # 1. 下载并安装内核
+          # 下载并安装内核
           curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
           chmod +x mihomo
 
       - name: Convert TXT to MRS
         run: |
-          # 2. 遍历 rules 目录下所有的 txt 文件，自动转换为 mrs
           find rules/ -name "*.txt" | while read file; do
             if [ -f "$file" ]; then
               filename="${file%.*}"
-              echo "正在转换: $file -> ${filename}.mrs"
+              echo "正在清洗并转换: $file -> ${filename}.mrs"
               
-              # 注意这里：格式参数从 yaml 换成了 text
+              # 【防崩溃神操作：深度清洗 TXT 文件】
+              # 1. 移除 Windows 的 \r 回车符
+              sed -i 's/\r//g' "$file"
+              # 2. 删除所有以 # 开头的注释行
+              sed -i '/^#/d' "$file"
+              # 3. 删除所有的纯空行
+              sed -i '/^[[:space:]]*$/d' "$file"
+              
+              # 清洗完毕后，安全喂给内核转换
               ./mihomo convert-ruleset classical text "$file" "${filename}.mrs"
             fi
           done
 
       - name: Commit and Push
         run: |
-          # 3. 提交转换后的二进制文件
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
@@ -42,6 +48,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-convert TXT to MRS"
+            git commit -m "Auto-clean and convert TXT to MRS"
             git push
           fi
