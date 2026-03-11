@@ -1,8 +1,8 @@
-name: Convert TXT to MRS
+name: Convert YAML to MRS
 on:
   push:
     paths:
-      - 'rules/**.txt'
+      - 'rules/**.yaml'
   workflow_dispatch:
 
 jobs:
@@ -14,27 +14,18 @@ jobs:
 
       - name: Download Mihomo
         run: |
-          # 下载并安装内核
           curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
           chmod +x mihomo
 
-      - name: Convert TXT to MRS
+      - name: Convert YAML to MRS
         run: |
-          find rules/ -name "*.txt" | while read file; do
+          find rules/ -name "*.yaml" | while read file; do
             if [ -f "$file" ]; then
               filename="${file%.*}"
-              echo "正在清洗并转换: $file -> ${filename}.mrs"
+              echo "正在转换: $file -> ${filename}.mrs"
               
-              # 【防崩溃神操作：深度清洗 TXT 文件】
-              # 1. 移除 Windows 的 \r 回车符
-              sed -i 's/\r//g' "$file"
-              # 2. 删除所有以 # 开头的注释行
-              sed -i '/^#/d' "$file"
-              # 3. 删除所有的纯空行
-              sed -i '/^[[:space:]]*$/d' "$file"
-              
-              # 清洗完毕后，安全喂给内核转换
-              ./mihomo convert-ruleset classical text "$file" "${filename}.mrs"
+              # classical 必须搭配 yaml 格式才能正常解析！
+              ./mihomo convert-ruleset classical yaml "$file" "${filename}.mrs"
             fi
           done
 
@@ -48,6 +39,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-clean and convert TXT to MRS"
+            git commit -m "Auto-convert YAML to MRS"
             git push
           fi
