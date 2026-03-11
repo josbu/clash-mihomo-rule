@@ -25,56 +25,74 @@ jobs:
           curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
           chmod +x mihomo
 
-      - name: Auto-Heal and Convert
+      - name: Nuclear Rebuild and Convert
         run: |
-          # 注入 Python 智能清洗脚本
-          cat << 'EOF' > healer.py
+          # 注入“降维打击”级别的暴力重构脚本
+          cat << 'EOF' > nuclear_rebuild.py
           import sys
           import yaml
 
           file_path = sys.argv[1]
+          
+          # 1. 暴力干掉所有幽灵空格（NBSP）和 Windows 换行符
+          with open(file_path, 'r', encoding='utf-8') as f:
+              content = f.read().replace('\xa0', ' ').replace('\r', '')
+              
+          # 2. 尝试解析提取规则
           try:
-              with open(file_path, 'r', encoding='utf-8') as f:
-                  data = yaml.safe_load(f)
-          except Exception as e:
-              print(f"⚠️ YAML 解析跳过 {file_path}: {e}")
+              data = yaml.safe_load(content)
+          except:
+              data = content.split('\n')
+              
+          rules = []
+          if isinstance(data, dict) and 'payload' in data:
+              items = data['payload']
+          elif isinstance(data, list):
+              items = data
+          else:
+              items = content.split('\n')
+              
+          if not items:
               sys.exit(0)
-
-          if not data or 'payload' not in data or not isinstance(data['payload'], list):
-              sys.exit(0)
-
-          new_payload = []
-          for rule in data['payload']:
-              if not isinstance(rule, str):
+              
+          # 3. 逐行清洗和修复
+          for item in items:
+              if not item or not isinstance(item, str):
                   continue
-              rule = rule.strip()
-              if not rule:
+              item = item.strip()
+              
+              # 跳过空行和注释
+              if not item or item.startswith('#'):
                   continue
               
-              # 自动修复旧版 +. 语法
-              if rule.startswith('+.'):
-                  rule = 'DOMAIN-SUFFIX,' + rule[2:]
-              
-              # 自动修复没有逗号的孤儿域名 (排除 MATCH)
-              if ',' not in rule and rule != 'MATCH':
-                  rule = 'DOMAIN,' + rule
+              # 剥离多余的列表符
+              if item.startswith('- '):
+                  item = item[2:].strip()
                   
-              new_payload.append(rule)
-
-          data['payload'] = new_payload
+              # 修复旧语法和漏掉前缀的孤儿域名
+              if item.startswith('+.'):
+                  item = 'DOMAIN-SUFFIX,' + item[2:]
+              elif ',' not in item and item != 'MATCH':
+                  item = 'DOMAIN,' + item
+                  
+              rules.append(item)
+              
+          # 4. 采用最标准的格式强行覆写原文件 (拒绝任何格式隐患)
           with open(file_path, 'w', encoding='utf-8') as f:
-              yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+              f.write("payload:\n")
+              for r in rules:
+                  f.write(f"  - {r}\n")
           EOF
 
-          # 遍历并处理所有 YAML 文件
+          # 遍历、重构并转换
           find rules/ -name "*.yaml" | while read file; do
             if [ -f "$file" ]; then
               filename="${file%.*}"
               echo "====================================="
-              echo "🛡️ 正在智能清洗: $file"
-              python3 healer.py "$file"
+              echo "☢️ 正在暴力重构: $file"
+              python3 nuclear_rebuild.py "$file"
               
-              echo "✅ 清洗完成，喂给内核转换..."
+              echo "✅ 重构完成，开始转换 MRS..."
               ./mihomo convert-ruleset classical yaml "$file" "${filename}.mrs"
             fi
           done
@@ -85,12 +103,11 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           git add rules/*.mrs
-          # 同时也把你被修复好的 yaml 源码推送到仓库，方便你以后查看
           git add rules/*.yaml 
           
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-heal rules and convert to MRS"
+            git commit -m "Nuclear rebuild YAML format and convert to MRS"
             git push
           fi
