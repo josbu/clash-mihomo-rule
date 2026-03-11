@@ -12,30 +12,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Mihomo and Config
+      - name: Download Mihomo
         run: |
           # 1. 下载并安装内核
           curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
           chmod +x mihomo
-          
-          # 2. 生成一个极其纯净的基础配置，完美避开 relay 等旧语法报错
-          mkdir -p ./config_dir
-          echo "mode: rule" > ./config_dir/config.yaml
 
       - name: Convert YAML to MRS
         run: |
-          # 遍历 rules 目录下所有的 yaml 文件，自动转换为 mrs
+          # 2. 遍历 rules 目录下所有的 yaml 文件，自动转换为 mrs
           find rules/ -name "*.yaml" | while read file; do
             if [ -f "$file" ]; then
               filename="${file%.*}"
               echo "正在转换: $file -> ${filename}.mrs"
-              # 注意：标准的编译命令格式是不需要加 -o 的，直接 输入文件 输出文件
-              ./mihomo -d ./config_dir rule-set compile "$file" "${filename}.mrs"
+              
+              # Mihomo 官方转换命令
+              ./mihomo convert-ruleset classical yaml "$file" "${filename}.mrs"
             fi
           done
 
       - name: Commit and Push
         run: |
+          # 3. 提交转换后的二进制文件
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
@@ -44,6 +42,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-convert YAML to MRS (Fixed config init)"
+            git commit -m "Auto-convert YAML to MRS via Mihomo CLI"
             git push
           fi
