@@ -15,22 +15,22 @@ jobs:
       - name: Download Mihomo and Config
         run: |
           # 1. 下载并安装内核
-          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-v2-v1.19.20.gz | gunzip > mihomo
+          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
           chmod +x mihomo
           
-          # 2. 创建配置目录并下载你提供的配置文件
+          # 2. 生成一个极其纯净的基础配置，完美避开 relay 等旧语法报错
           mkdir -p ./config_dir
-          curl -L -o ./config_dir/config.yaml https://github.com/josbu/clash-mihomo-rule/raw/main/clash-mihomo/mihomo.yaml
+          echo "mode: rule" > ./config_dir/config.yaml
 
       - name: Convert YAML to MRS
         run: |
-          # 使用 -d 指定刚刚准备好的配置目录
-          # 这样它读到了 config.yaml 就会乖乖执行命令，而不会卡在“初始化”步骤
+          # 遍历 rules 目录下所有的 yaml 文件，自动转换为 mrs
           find rules/ -name "*.yaml" | while read file; do
             if [ -f "$file" ]; then
               filename="${file%.*}"
-              echo "正在转换: $file"
-              ./mihomo -d ./config_dir rule-set compile "$file" -o "${filename}.mrs"
+              echo "正在转换: $file -> ${filename}.mrs"
+              # 注意：标准的编译命令格式是不需要加 -o 的，直接 输入文件 输出文件
+              ./mihomo -d ./config_dir rule-set compile "$file" "${filename}.mrs"
             fi
           done
 
@@ -44,6 +44,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Auto-convert YAML to MRS with config support"
+            git commit -m "Auto-convert YAML to MRS (Fixed config init)"
             git push
           fi
