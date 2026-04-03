@@ -134,7 +134,7 @@ jobs:
           def build_yaml_payload(path: Path, rules: list[str], suffix: str) -> Path:
               tmp_yaml = path.with_suffix(suffix)
               tmp_yaml.write_text(
-                  yaml.safe_dump({'payload': rules}, allow_unicode=True, sort_keys=False),
+                  'payload:\n' + ''.join(f'  - {rule}\n' for rule in rules),
                   encoding='utf-8'
               )
               return tmp_yaml
