@@ -139,13 +139,50 @@ jobs:
               )
               return tmp_yaml
 
+          def try_convert_yaml(source_path: Path, target_path: Path) -> tuple[bool, str]:
+              result = subprocess.run(
+                  ['./mihomo', 'convert-ruleset', 'classical', 'yaml', str(source_path), str(target_path)],
+                  capture_output=True,
+                  text=True,
+              )
+              message = (result.stderr or result.stdout or '').strip()
+              return result.returncode == 0, message
+
+          def split_convertible_rules(path: Path, rules: list[tuple[int, str]], skipped_rules: list[tuple[int, str, str]]) -> list[str]:
+              if not rules:
+                  return []
+
+              candidate_yaml = build_yaml_payload(path, [rule for _, rule in rules], '.candidate.yaml')
+              candidate_mrs = path.with_suffix('.candidate.mrs')
+              try:
+                  ok, reason = try_convert_yaml(candidate_yaml, candidate_mrs)
+              finally:
+                  if candidate_yaml.exists():
+                      candidate_yaml.unlink()
+                  if candidate_mrs.exists():
+                      candidate_mrs.unlink()
+
+              if ok:
+                  return [rule for _, rule in rules]
+
+              if len(rules) == 1:
+                  idx, rule = rules[0]
+                  detail = reason.splitlines()[-1] if reason else 'mihomo convert failed'
+                  skipped_rules.append((idx, rule, detail))
+                  return []
+
+              mid = len(rules) // 2
+              left = split_convertible_rules(path, rules[:mid], skipped_rules)
+              right = split_convertible_rules(path, rules[mid:], skipped_rules)
+              return left + right
+
           def filter_yaml_rules(path: Path) -> Path:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
               payload = data.get('payload') if isinstance(data, dict) else None
               if not isinstance(payload, list):
                   raise ValueError(f'Invalid payload in {path.as_posix()}')
 
-              valid_rules = []
+              candidate_rules = []
               skipped_rules = []
 
               for idx, rule in enumerate(payload, start=1):
@@ -157,10 +194,13 @@ jobs:
                       skipped_rules.append((idx, rule, 'unsupported PROCESS-NAME rule'))
                       continue
 
-                  valid_rules.append(rule)
+                  candidate_rules.append((idx, rule))
+
+              valid_rules = split_convertible_rules(path, candidate_rules, skipped_rules)
 
               if skipped_rules:
-                  print(f'Skipped {len(skipped_rules)} unsupported rules in {path.as_posix()}:')
+                  skipped_rules.sort(key=lambda item: item[0])
+                  print(f'Skipped {len(skipped_rules)} unsupported or crashing rules in {path.as_posix()}:')
                   for idx, rule, reason in skipped_rules:
                       print(f'  line #{idx}: {rule} -- {reason}')
 
