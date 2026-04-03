@@ -30,7 +30,7 @@ jobs:
 
       - name: Download Mihomo
         run: |
-          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
+          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.20.0/mihomo-linux-amd64-compatible-v1.20.0.gz | gunzip > mihomo
           chmod +x mihomo
 
       - name: Collect changed rule files
