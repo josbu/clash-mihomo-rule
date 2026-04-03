@@ -139,25 +139,6 @@ jobs:
               )
               return tmp_yaml
 
-          def convert_rule(rule: str, path: Path, idx: int) -> tuple[bool, str | None]:
-              candidate_yaml = build_yaml_payload(path, [rule], f'.validate-{idx}.yaml')
-              candidate_mrs = path.with_suffix(f'.validate-{idx}.mrs')
-              try:
-                  result = subprocess.run(
-                      ['./mihomo', 'convert-ruleset', 'classical', 'yaml', str(candidate_yaml), str(candidate_mrs)],
-                      capture_output=True,
-                      text=True,
-                  )
-                  if result.returncode == 0:
-                      return True, None
-                  reason = (result.stderr or result.stdout or 'mihomo convert failed').strip()
-                  return False, reason.splitlines()[-1]
-              finally:
-                  if candidate_yaml.exists():
-                      candidate_yaml.unlink()
-                  if candidate_mrs.exists():
-                      candidate_mrs.unlink()
-
           def filter_yaml_rules(path: Path) -> Path:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
               payload = data.get('payload') if isinstance(data, dict) else None
@@ -176,16 +157,15 @@ jobs:
                       skipped_rules.append((idx, rule, 'unsupported PROCESS-NAME rule'))
                       continue
 
-                  ok, reason = convert_rule(rule, path, idx)
-                  if ok:
-                      valid_rules.append(rule)
-                  else:
-                      skipped_rules.append((idx, rule, reason or 'mihomo convert failed'))
+                  valid_rules.append(rule)
 
               if skipped_rules:
-                  print(f'Skipped {len(skipped_rules)} unsupported or invalid rules in {path.as_posix()}:')
+                  print(f'Skipped {len(skipped_rules)} unsupported rules in {path.as_posix()}:')
                   for idx, rule, reason in skipped_rules:
                       print(f'  line #{idx}: {rule} -- {reason}')
+
+              if len(valid_rules) == len(payload):
+                  return path
 
               if not valid_rules:
                   raise ValueError(f'No valid YAML rules remain: {path.as_posix()}')
@@ -217,7 +197,7 @@ jobs:
                           ], check=True)
                           print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
                       finally:
-                          if sanitized_yaml.exists():
+                          if sanitized_yaml != path and sanitized_yaml.exists():
                               sanitized_yaml.unlink()
                   elif suffix == '.txt':
                       tmp_yaml = path.with_suffix('.tmp-convert.yaml')
