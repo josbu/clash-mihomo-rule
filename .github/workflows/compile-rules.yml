@@ -86,12 +86,11 @@ jobs:
           GITHUB_EVENT_BEFORE: ${{ github.event.before }}
           GITHUB_SHA: ${{ github.sha }}
 
-      - name: Normalize and convert changed rules
+      - name: Convert changed rules
         run: |
-          cat <<'EOF' > convert_rules.py
+          cat <<'EOF' > convert_txt_rules.py
           import sys
           from pathlib import Path
-          import yaml
 
           def normalize_rule(item: str) -> str | None:
               item = item.strip().replace('\xa0', ' ')
@@ -105,44 +104,22 @@ jobs:
                   item = 'DOMAIN,' + item
               return item or None
 
-          def collect_rules(path: Path):
-              content = path.read_text(encoding='utf-8').replace('\r', '')
-              if path.suffix.lower() == '.txt':
-                  items = content.split('\n')
-              else:
-                  try:
-                      data = yaml.safe_load(content)
-                  except Exception:
-                      data = content.split('\n')
-
-                  if isinstance(data, dict) and 'payload' in data:
-                      items = data['payload']
-                  elif isinstance(data, list):
-                      items = data
-                  else:
-                      items = content.split('\n')
-
-              rules = []
-              for item in items or []:
-                  if not isinstance(item, str):
-                      continue
-                  normalized = normalize_rule(item)
-                  if normalized:
-                      rules.append(normalized)
-              return rules
-
-          def write_payload_yaml(path: Path, rules):
-              path.write_text(
-                  'payload:\n' + ''.join(f'  - {rule}\n' for rule in rules),
-                  encoding='utf-8'
-              )
-
           input_path = Path(sys.argv[1])
           output_path = Path(sys.argv[2])
-          rules = collect_rules(input_path)
+          content = input_path.read_text(encoding='utf-8').replace('\r', '')
+          rules = []
+          for line in content.split('\n'):
+              normalized = normalize_rule(line)
+              if normalized:
+                  rules.append(normalized)
+
           if not rules:
               raise SystemExit(0)
-          write_payload_yaml(output_path, rules)
+
+          output_path.write_text(
+              'payload:\n' + ''.join(f'  - {rule}\n' for rule in rules),
+              encoding='utf-8'
+          )
           EOF
 
           python3 - <<'PY'
@@ -156,6 +133,7 @@ jobs:
               path = Path(change['path'])
               mrs_path = path.with_suffix('.mrs')
               status = change['status']
+              suffix = path.suffix.lower()
 
               if status == 'D':
                   if mrs_path.exists():
@@ -167,19 +145,31 @@ jobs:
                   print(f'Skip missing source: {path.as_posix()}')
                   continue
 
-              tmp_yaml = path.with_suffix('.tmp-convert.yaml')
               try:
-                  subprocess.run(['python3', 'convert_rules.py', str(path), str(tmp_yaml)], check=True)
-                  if tmp_yaml.exists() and tmp_yaml.stat().st_size > 0:
+                  if suffix in ('.yaml', '.yml'):
                       subprocess.run([
-                          './mihomo', 'convert-ruleset', 'classical', 'yaml', str(tmp_yaml), str(mrs_path)
+                          './mihomo', 'convert-ruleset', 'classical', 'yaml', str(path), str(mrs_path)
                       ], check=True)
-                      print(f'Converted: {path.as_posix()} -> {mrs_path.as_posix()}')
+                      print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
+                  elif suffix == '.txt':
+                      tmp_yaml = path.with_suffix('.tmp-convert.yaml')
+                      try:
+                          subprocess.run(['python3', 'convert_txt_rules.py', str(path), str(tmp_yaml)], check=True)
+                          if tmp_yaml.exists() and tmp_yaml.stat().st_size > 0:
+                              subprocess.run([
+                                  './mihomo', 'convert-ruleset', 'classical', 'yaml', str(tmp_yaml), str(mrs_path)
+                              ], check=True)
+                              print(f'Converted TXT: {path.as_posix()} -> {mrs_path.as_posix()}')
+                          else:
+                              print(f'Skip empty TXT rules: {path.as_posix()}')
+                      finally:
+                          if tmp_yaml.exists():
+                              tmp_yaml.unlink()
                   else:
-                      print(f'Skip empty rules: {path.as_posix()}')
-              finally:
-                  if tmp_yaml.exists():
-                      tmp_yaml.unlink()
+                      print(f'Skip unsupported file: {path.as_posix()}')
+              except subprocess.CalledProcessError as error:
+                  print(f'Conversion failed for {path.as_posix()} (suffix: {suffix})')
+                  raise error
           PY
 
       - name: Commit and push
