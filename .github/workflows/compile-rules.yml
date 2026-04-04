@@ -142,7 +142,7 @@ jobs:
               )
               return tmp_yaml
 
-          def filter_yaml_rules(path: Path) -> Path:
+          def filter_yaml_rules(path: Path) -> tuple[Path | None, list[tuple[int, str, str]]]:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
               payload = data.get('payload') if isinstance(data, dict) else None
               if not isinstance(payload, list):
@@ -169,13 +169,17 @@ jobs:
                       print(f'  line #{idx}: {rule} -- {reason}')
 
               if not valid_rules:
-                  print(f'No valid YAML rules remain: {path.as_posix()}')
-                  return path
+                  print(f'Skip YAML with no supported rules: {path.as_posix()}')
+                  return None, skipped_rules
 
               if len(valid_rules) == len(payload):
-                  return path
+                  return path, skipped_rules
 
-              return build_yaml_payload(path, valid_rules, '.sanitized.yaml')
+              return build_yaml_payload(path, valid_rules, '.sanitized.yaml'), skipped_rules
+
+          def remove_invalid_mrs(path: Path) -> None:
+              if path.exists() and path.stat().st_size == 0:
+                  path.unlink()
 
           for change in changes:
               path = Path(change['path'])
@@ -195,29 +199,29 @@ jobs:
 
               try:
                   if suffix in ('.yaml', '.yml'):
-                      result = subprocess.run([
-                          './mihomo', 'convert-ruleset', 'classical', 'yaml', str(path), str(mrs_path)
-                      ], capture_output=True, text=True)
-                      if result.returncode == 0:
-                          print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
-                      else:
-                          sanitized_yaml = filter_yaml_rules(path)
-                          if sanitized_yaml == path:
+                      sanitized_yaml, _ = filter_yaml_rules(path)
+                      if sanitized_yaml is None:
+                          remove_invalid_mrs(mrs_path)
+                          continue
+
+                      try:
+                          result = subprocess.run([
+                              './mihomo', 'convert-ruleset', 'classical', 'yaml', str(sanitized_yaml), str(mrs_path)
+                          ], capture_output=True, text=True)
+                          if result.returncode == 0:
+                              remove_invalid_mrs(mrs_path)
+                              if mrs_path.exists():
+                                  print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
+                              else:
+                                  print(f'Failed YAML: {path.as_posix()}')
+                                  print('Generated empty .mrs file and removed it')
+                          else:
+                              remove_invalid_mrs(mrs_path)
                               print(f'Failed YAML: {path.as_posix()}')
                               print((result.stderr or result.stdout or '').strip())
-                          else:
-                              try:
-                                  fallback_result = subprocess.run([
-                                      './mihomo', 'convert-ruleset', 'classical', 'yaml', str(sanitized_yaml), str(mrs_path)
-                                  ], capture_output=True, text=True)
-                                  if fallback_result.returncode == 0:
-                                      print(f'Converted YAML with fallback: {path.as_posix()} -> {mrs_path.as_posix()}')
-                                  else:
-                                      print(f'Failed YAML: {path.as_posix()}')
-                                      print((fallback_result.stderr or fallback_result.stdout or '').strip())
-                              finally:
-                                  if sanitized_yaml.exists():
-                                      sanitized_yaml.unlink()
+                      finally:
+                          if sanitized_yaml != path and sanitized_yaml.exists():
+                              sanitized_yaml.unlink()
                   elif suffix == '.txt':
                       tmp_yaml = path.with_suffix('.tmp-convert.yaml')
                       try:
@@ -248,7 +252,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          find rules -name "*.mrs" -print0 | xargs -0 git add
+          find rules -name "*.mrs" -type f ! -size 0 -print0 | xargs -0 -r git add
+          find rules -name "*.mrs" -type f -size 0 -delete
           git add -u rules
 
           if git diff --staged --quiet; then
