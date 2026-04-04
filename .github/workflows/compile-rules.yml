@@ -282,16 +282,16 @@ jobs:
                               print(f'Initial sanitized conversion failed for {path.as_posix()}, probing smaller rule sets...')
                               safe_rules = collect_safe_rules(path, valid_rules)
                               if not safe_rules:
-                                  print(f'Skip YAML with no convertible rules after probing: {path.as_posix()}')
-                                  continue
+                                  print(f'No probe subset converted for {path.as_posix()}, retrying full sanitized YAML as a fallback output.')
+                                  result = run_mihomo_convert(final_yaml, mrs_path)
+                              else:
+                                  if safe_rules != valid_rules:
+                                      if cleanup_yaml and final_yaml.exists():
+                                          final_yaml.unlink()
+                                      final_yaml = build_yaml_payload(path, safe_rules, '.sanitized.yaml')
+                                      cleanup_yaml = True
 
-                              if safe_rules != valid_rules:
-                                  if cleanup_yaml and final_yaml.exists():
-                                      final_yaml.unlink()
-                                  final_yaml = build_yaml_payload(path, safe_rules, '.sanitized.yaml')
-                                  cleanup_yaml = True
-
-                              result = run_mihomo_convert(final_yaml, mrs_path)
+                                  result = run_mihomo_convert(final_yaml, mrs_path)
 
                           if result.returncode == 0:
                               remove_invalid_mrs(mrs_path)
