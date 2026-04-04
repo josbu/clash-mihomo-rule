@@ -128,6 +128,7 @@ jobs:
           python3 - <<'PY'
           import json
           import subprocess
+          import tempfile
           from pathlib import Path
 
           import yaml
@@ -142,7 +143,7 @@ jobs:
               )
               return tmp_yaml
 
-          def filter_yaml_rules(path: Path) -> tuple[Path | None, list[tuple[int, str, str]]]:
+          def filter_yaml_rules(path: Path) -> tuple[Path | None, list[str], list[tuple[int, str, str]]]:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
               payload = data.get('payload') if isinstance(data, dict) else None
               if not isinstance(payload, list):
@@ -188,16 +189,64 @@ jobs:
 
               if not valid_rules:
                   print(f'Skip YAML with no supported rules: {path.as_posix()}')
-                  return None, skipped_rules
+                  return None, [], skipped_rules
 
               if len(valid_rules) == len(payload):
-                  return path, skipped_rules
+                  return path, valid_rules, skipped_rules
 
-              return build_yaml_payload(path, valid_rules, '.sanitized.yaml'), skipped_rules
+              return build_yaml_payload(path, valid_rules, '.sanitized.yaml'), valid_rules, skipped_rules
+
+          def run_mihomo_convert(source_path: Path, output_path: Path) -> subprocess.CompletedProcess[str]:
+              return subprocess.run([
+                  './mihomo', 'convert-ruleset', 'classical', 'yaml', str(source_path), str(output_path)
+              ], capture_output=True, text=True)
 
           def remove_invalid_mrs(path: Path) -> None:
               if path.exists() and path.stat().st_size == 0:
                   path.unlink()
+
+          def can_convert_rules(path: Path, rules: list[str]) -> bool:
+              if not rules:
+                  return False
+
+              with tempfile.TemporaryDirectory() as tmpdir:
+                  tmpdir_path = Path(tmpdir)
+                  probe_yaml = tmpdir_path / f'{path.stem}.probe.yaml'
+                  probe_yaml.write_text(
+                      'payload:\n' + ''.join(f'  - {rule}\n' for rule in rules),
+                      encoding='utf-8'
+                  )
+                  probe_mrs = tmpdir_path / f'{path.stem}.probe.mrs'
+                  result = run_mihomo_convert(probe_yaml, probe_mrs)
+                  return result.returncode == 0 and probe_mrs.exists() and probe_mrs.stat().st_size > 0
+
+          def collect_safe_rules(path: Path, rules: list[str], batch_size: int = 32) -> list[str]:
+              safe_rules: list[str] = []
+              excluded_rules: list[str] = []
+
+              def probe_subset(subset: list[str]) -> None:
+                  if not subset:
+                      return
+                  if can_convert_rules(path, subset):
+                      safe_rules.extend(subset)
+                      return
+                  if len(subset) == 1:
+                      excluded_rules.extend(subset)
+                      return
+
+                  midpoint = max(1, len(subset) // 2)
+                  probe_subset(subset[:midpoint])
+                  probe_subset(subset[midpoint:])
+
+              for start in range(0, len(rules), batch_size):
+                  probe_subset(rules[start:start + batch_size])
+
+              if excluded_rules:
+                  print(f'Excluded {len(excluded_rules)} crashing rules in {path.as_posix()} after probing:')
+                  for rule in excluded_rules:
+                      print(f'  - {rule}')
+
+              return safe_rules
 
           for change in changes:
               path = Path(change['path'])
@@ -217,15 +266,32 @@ jobs:
 
               try:
                   if suffix in ('.yaml', '.yml'):
-                      sanitized_yaml, _ = filter_yaml_rules(path)
+                      sanitized_yaml, valid_rules, _ = filter_yaml_rules(path)
                       if sanitized_yaml is None:
                           remove_invalid_mrs(mrs_path)
                           continue
 
+                      final_yaml = sanitized_yaml
+                      cleanup_yaml = sanitized_yaml != path
+
                       try:
-                          result = subprocess.run([
-                              './mihomo', 'convert-ruleset', 'classical', 'yaml', str(sanitized_yaml), str(mrs_path)
-                          ], capture_output=True, text=True)
+                          result = run_mihomo_convert(final_yaml, mrs_path)
+                          if result.returncode != 0 or not mrs_path.exists() or mrs_path.stat().st_size == 0:
+                              remove_invalid_mrs(mrs_path)
+                              print(f'Initial sanitized conversion failed for {path.as_posix()}, probing smaller rule sets...')
+                              safe_rules = collect_safe_rules(path, valid_rules)
+                              if not safe_rules:
+                                  print(f'Skip YAML with no convertible rules after probing: {path.as_posix()}')
+                                  continue
+
+                              if safe_rules != valid_rules:
+                                  if cleanup_yaml and final_yaml.exists():
+                                      final_yaml.unlink()
+                                  final_yaml = build_yaml_payload(path, safe_rules, '.sanitized.yaml')
+                                  cleanup_yaml = True
+
+                              result = run_mihomo_convert(final_yaml, mrs_path)
+
                           if result.returncode == 0:
                               remove_invalid_mrs(mrs_path)
                               if mrs_path.exists():
@@ -238,8 +304,8 @@ jobs:
                               print(f'Failed YAML: {path.as_posix()}')
                               print((result.stderr or result.stdout or '').strip())
                       finally:
-                          if sanitized_yaml != path and sanitized_yaml.exists():
-                              sanitized_yaml.unlink()
+                          if cleanup_yaml and final_yaml.exists():
+                              final_yaml.unlink()
                   elif suffix == '.txt':
                       tmp_yaml = path.with_suffix('.tmp-convert.yaml')
                       try:
