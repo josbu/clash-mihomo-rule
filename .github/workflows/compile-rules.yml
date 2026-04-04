@@ -1,11 +1,6 @@
 name: Convert rules to MRS
 
 on:
-  push:
-    paths:
-      - 'rules/**/*.yaml'
-      - 'rules/**/*.yml'
-      - 'rules/**/*.txt'
   workflow_dispatch:
 
 permissions:
@@ -36,60 +31,24 @@ jobs:
           chmod +x mihomo
           ./mihomo -v || true
 
-      - name: Collect changed rule files
+      - name: Collect all rule files
         run: |
           python3 - <<'PY'
           import json
-          import os
-          import subprocess
           from pathlib import Path
 
-          event_name = os.environ['GITHUB_EVENT_NAME']
-          before = os.environ.get('GITHUB_EVENT_BEFORE', '')
-          current = os.environ['GITHUB_SHA']
           exts = {'.yaml', '.yml', '.txt'}
           changes = []
 
-          def is_rule_file(path: str) -> bool:
-              p = Path(path)
-              return p.parts and p.parts[0] == 'rules' and p.suffix.lower() in exts
-
-          if event_name == 'workflow_dispatch' or not before or set(before) == {'0'}:
-              for path in sorted(Path('rules').rglob('*')):
-                  if path.is_file() and is_rule_file(path.as_posix()):
-                      changes.append({'status': 'A', 'path': path.as_posix()})
-          else:
-              result = subprocess.run(
-                  ['git', 'diff', '--name-status', before, current],
-                  check=True,
-                  capture_output=True,
-                  text=True,
-              )
-              for line in result.stdout.splitlines():
-                  if not line.strip():
-                      continue
-                  parts = line.split('\t')
-                  status = parts[0]
-                  if status.startswith('R') and len(parts) >= 3:
-                      old_path, new_path = parts[1], parts[2]
-                      if is_rule_file(old_path):
-                          changes.append({'status': 'D', 'path': old_path})
-                      if is_rule_file(new_path):
-                          changes.append({'status': 'A', 'path': new_path})
-                  elif len(parts) >= 2:
-                      path = parts[1]
-                      if is_rule_file(path):
-                          changes.append({'status': status[0], 'path': path})
+          for path in sorted(Path('rules').rglob('*')):
+              if path.is_file() and path.suffix.lower() in exts:
+                  changes.append({'status': 'A', 'path': path.as_posix()})
 
           Path('changed_rules.json').write_text(json.dumps(changes, ensure_ascii=False), encoding='utf-8')
           print(json.dumps(changes, ensure_ascii=False, indent=2))
           PY
-        env:
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
-          GITHUB_SHA: ${{ github.sha }}
 
-      - name: Convert changed rules
+      - name: Convert all rules
         run: |
           cat <<'EOF' > convert_txt_rules.py
           import sys
