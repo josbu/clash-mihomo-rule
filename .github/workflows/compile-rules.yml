@@ -31,6 +31,37 @@ jobs:
           chmod +x mihomo
           ./mihomo -v || true
 
+      - name: Validate Mihomo classical conversion
+        run: |
+          cat <<'EOF' > validate_mihomo_classical.py
+          import subprocess
+          from pathlib import Path
+
+          sample_yaml = Path('mihomo-classical-smoke.yaml')
+          sample_mrs = Path('mihomo-classical-smoke.mrs')
+          sample_yaml.write_text('payload:\n  - DOMAIN-SUFFIX,example.com\n', encoding='utf-8')
+
+          try:
+              result = subprocess.run(
+                  ['./mihomo', 'convert-ruleset', 'classical', 'yaml', str(sample_yaml), str(sample_mrs)],
+                  capture_output=True,
+                  text=True,
+              )
+              if result.returncode != 0 or not sample_mrs.exists() or sample_mrs.stat().st_size == 0:
+                  print('Mihomo classical conversion is unavailable in this release; skipping .mrs generation for this run.')
+                  print((result.stderr or result.stdout or '').strip())
+                  Path('mihomo_classical_available.txt').write_text('0\n', encoding='utf-8')
+              else:
+                  Path('mihomo_classical_available.txt').write_text('1\n', encoding='utf-8')
+          finally:
+              if sample_yaml.exists():
+                  sample_yaml.unlink()
+              if sample_mrs.exists():
+                  sample_mrs.unlink()
+          EOF
+
+          python3 validate_mihomo_classical.py
+
       - name: Collect all rule files
         run: |
           python3 - <<'PY'
@@ -93,6 +124,7 @@ jobs:
           import yaml
 
           changes = json.loads(Path('changed_rules.json').read_text(encoding='utf-8'))
+          mihomo_classical_available = Path('mihomo_classical_available.txt').read_text(encoding='utf-8').strip() == '1'
 
           def build_yaml_payload(path: Path, rules: list[str], suffix: str) -> Path:
               tmp_yaml = path.with_suffix(suffix)
@@ -199,6 +231,11 @@ jobs:
 
               if not path.exists():
                   print(f'Skip missing source: {path.as_posix()}')
+                  continue
+
+              if not mihomo_classical_available:
+                  remove_invalid_mrs(mrs_path)
+                  print(f'Skip MRS conversion because Mihomo classical conversion is unavailable: {path.as_posix()}')
                   continue
 
               try:
