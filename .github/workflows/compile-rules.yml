@@ -219,7 +219,7 @@ jobs:
                   probe_mrs = tmpdir_path / f'{path.stem}.probe.mrs'
                   result = run_mihomo_convert(probe_yaml, probe_mrs)
                   remove_invalid_mrs(probe_mrs)
-                  return result.returncode == 0
+                  return result.returncode == 0 and len(rules) == 1
 
           def collect_safe_rules(path: Path, rules: list[str], batch_size: int = 32) -> list[str]:
               safe_rules: list[str] = []
@@ -228,11 +228,11 @@ jobs:
               def probe_subset(subset: list[str]) -> None:
                   if not subset:
                       return
-                  if can_convert_rules(path, subset):
-                      safe_rules.extend(subset)
-                      return
                   if len(subset) == 1:
-                      excluded_rules.extend(subset)
+                      if can_convert_rules(path, subset):
+                          safe_rules.extend(subset)
+                      else:
+                          excluded_rules.extend(subset)
                       return
 
                   midpoint = max(1, len(subset) // 2)
