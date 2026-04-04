@@ -164,6 +164,35 @@ jobs:
               if path.exists() and path.stat().st_size == 0:
                   path.unlink()
 
+          def split_rule_options(rule: str) -> tuple[str, list[str]]:
+              parts = [part.strip() for part in rule.split(',')]
+              rule_type = parts[0] if parts else ''
+              if rule_type == 'MATCH':
+                  return 'MATCH', []
+              if len(parts) < 2:
+                  return rule, []
+              target = ','.join(parts[:2])
+              options = parts[2:]
+              return target, options
+
+          def build_rule_variants(rule: str) -> list[str]:
+              target, options = split_rule_options(rule)
+              if target == 'MATCH':
+                  return ['MATCH']
+              if not options:
+                  return [target]
+
+              variants = [target]
+              if 'no-resolve' in options:
+                  variants.append(','.join([target, 'no-resolve']))
+              return variants
+
+          def pick_convertible_rule(path: Path, rule: str) -> str | None:
+              for variant in build_rule_variants(rule):
+                  if can_convert_rules(path, [variant]):
+                      return variant
+              return None
+
           def can_convert_rules(path: Path, rules: list[str]) -> bool:
               if not rules:
                   return False
@@ -178,28 +207,18 @@ jobs:
                   probe_mrs = tmpdir_path / f'{path.stem}.probe.mrs'
                   result = run_mihomo_convert(probe_yaml, probe_mrs)
                   remove_invalid_mrs(probe_mrs)
-                  return result.returncode == 0 and len(rules) == 1
+                  return result.returncode == 0
 
-          def collect_safe_rules(path: Path, rules: list[str], batch_size: int = 32) -> list[str]:
+          def collect_safe_rules(path: Path, rules: list[str]) -> list[str]:
               safe_rules: list[str] = []
               excluded_rules: list[str] = []
 
-              def probe_subset(subset: list[str]) -> None:
-                  if not subset:
-                      return
-                  if len(subset) == 1:
-                      if can_convert_rules(path, subset):
-                          safe_rules.extend(subset)
-                      else:
-                          excluded_rules.extend(subset)
-                      return
-
-                  midpoint = max(1, len(subset) // 2)
-                  probe_subset(subset[:midpoint])
-                  probe_subset(subset[midpoint:])
-
-              for start in range(0, len(rules), batch_size):
-                  probe_subset(rules[start:start + batch_size])
+              for rule in rules:
+                  convertible_rule = pick_convertible_rule(path, rule)
+                  if convertible_rule is not None:
+                      safe_rules.append(convertible_rule)
+                  else:
+                      excluded_rules.append(rule)
 
               if excluded_rules:
                   print(f'Excluded {len(excluded_rules)} crashing rules in {path.as_posix()} after probing:')
@@ -296,13 +315,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          find rules -name "*.mrs" -type f ! -size 0 -print0 | xargs -0 -r git add
           find rules -name "*.mrs" -type f -size 0 -delete
-          git add -u rules
+          git add -A rules
 
           if git diff --staged --quiet; then
             echo "没有变化，跳过提交。"
           else
-            git commit -m "Sync MRS files for updated rules"
+            git commit -m "Sync MRS files for manual rebuild"
             git push
           fi
