@@ -1,6 +1,12 @@
 name: Convert rules to MRS
 
 on:
+  push:
+    paths:
+      - 'rules/**/*.yaml'
+      - 'rules/**/*.yml'
+      - 'rules/**/*.txt'
+      - '.github/workflows/compile-rules.yml'
   workflow_dispatch:
 
 permissions:
