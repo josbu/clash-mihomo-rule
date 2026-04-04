@@ -195,19 +195,29 @@ jobs:
 
               try:
                   if suffix in ('.yaml', '.yml'):
-                      sanitized_yaml = filter_yaml_rules(path)
-                      try:
-                          result = subprocess.run([
-                              './mihomo', 'convert-ruleset', 'classical', 'yaml', str(sanitized_yaml), str(mrs_path)
-                          ], capture_output=True, text=True)
-                          if result.returncode == 0:
-                              print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
-                          else:
+                      result = subprocess.run([
+                          './mihomo', 'convert-ruleset', 'classical', 'yaml', str(path), str(mrs_path)
+                      ], capture_output=True, text=True)
+                      if result.returncode == 0:
+                          print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
+                      else:
+                          sanitized_yaml = filter_yaml_rules(path)
+                          if sanitized_yaml == path:
                               print(f'Failed YAML: {path.as_posix()}')
                               print((result.stderr or result.stdout or '').strip())
-                      finally:
-                          if sanitized_yaml != path and sanitized_yaml.exists():
-                              sanitized_yaml.unlink()
+                          else:
+                              try:
+                                  fallback_result = subprocess.run([
+                                      './mihomo', 'convert-ruleset', 'classical', 'yaml', str(sanitized_yaml), str(mrs_path)
+                                  ], capture_output=True, text=True)
+                                  if fallback_result.returncode == 0:
+                                      print(f'Converted YAML with fallback: {path.as_posix()} -> {mrs_path.as_posix()}')
+                                  else:
+                                      print(f'Failed YAML: {path.as_posix()}')
+                                      print((fallback_result.stderr or fallback_result.stdout or '').strip())
+                              finally:
+                                  if sanitized_yaml.exists():
+                                      sanitized_yaml.unlink()
                   elif suffix == '.txt':
                       tmp_yaml = path.with_suffix('.tmp-convert.yaml')
                       try:
