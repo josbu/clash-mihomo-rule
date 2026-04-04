@@ -31,7 +31,7 @@ jobs:
 
       - name: Download Mihomo
         env:
-          MIHOMO_VERSION: v1.18.10
+          MIHOMO_VERSION: v1.19.22
         run: |
           curl -fL "https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/mihomo-linux-amd64-compatible-${MIHOMO_VERSION}.gz" | gunzip > mihomo
           chmod +x mihomo
@@ -82,10 +82,11 @@ jobs:
           from pathlib import Path
 
           exts = {'.yaml', '.yml', '.txt'}
+          ignored_suffixes = ('.sanitized.yaml', '.tmp-convert.yaml')
           changes = []
 
           for path in sorted(Path('rules').rglob('*')):
-              if path.is_file() and path.suffix.lower() in exts:
+              if path.is_file() and path.suffix.lower() in exts and not any(path.as_posix().endswith(suffix) for suffix in ignored_suffixes):
                   changes.append({'status': 'A', 'path': path.as_posix()})
 
           Path('changed_rules.json').write_text(json.dumps(changes, ensure_ascii=False), encoding='utf-8')
