@@ -177,7 +177,7 @@ jobs:
                   return f'{rule_type},{target}', 'domain', None
 
               if rule_type in IP_RULE_TYPES:
-                  allowed_options = set()
+                  allowed_options = {'no-resolve'}
                   if any(option not in allowed_options for option in normalized_options):
                       return None, 'ipcidr', 'unsupported rule options for ipcidr MRS conversion'
                   return target, 'ipcidr', None
