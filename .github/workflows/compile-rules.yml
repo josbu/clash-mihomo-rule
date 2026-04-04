@@ -148,6 +148,20 @@ jobs:
               if not isinstance(payload, list):
                   raise ValueError(f'Invalid payload in {path.as_posix()}')
 
+              safe_prefixes = {
+                  'DOMAIN,',
+                  'DOMAIN-SUFFIX,',
+                  'DOMAIN-KEYWORD,',
+                  'DOMAIN-REGEX,',
+                  'IP-CIDR,',
+                  'IP-CIDR6,',
+                  'IP-ASN,',
+                  'SRC-IP-CIDR,',
+                  'SRC-IP-ASN,',
+                  'GEOIP,',
+                  'MATCH',
+              }
+
               valid_rules = []
               skipped_rules = []
 
@@ -156,11 +170,15 @@ jobs:
                       skipped_rules.append((idx, repr(rule), 'non-string rule'))
                       continue
 
-                  if rule.startswith('PROCESS-NAME,'):
-                      skipped_rules.append((idx, rule, 'unsupported PROCESS-NAME rule'))
+                  if rule == 'MATCH':
+                      valid_rules.append(rule)
                       continue
 
-                  valid_rules.append(rule)
+                  if any(rule.startswith(prefix) for prefix in safe_prefixes if prefix != 'MATCH'):
+                      valid_rules.append(rule)
+                      continue
+
+                  skipped_rules.append((idx, rule, 'unsupported rule type for MRS conversion'))
 
               if skipped_rules:
                   skipped_rules.sort(key=lambda item: item[0])
