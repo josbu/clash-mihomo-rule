@@ -218,7 +218,8 @@ jobs:
                   )
                   probe_mrs = tmpdir_path / f'{path.stem}.probe.mrs'
                   result = run_mihomo_convert(probe_yaml, probe_mrs)
-                  return result.returncode == 0 and probe_mrs.exists() and probe_mrs.stat().st_size > 0
+                  remove_invalid_mrs(probe_mrs)
+                  return result.returncode == 0
 
           def collect_safe_rules(path: Path, rules: list[str], batch_size: int = 32) -> list[str]:
               safe_rules: list[str] = []
