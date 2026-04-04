@@ -31,28 +31,28 @@ jobs:
           chmod +x mihomo
           ./mihomo -v || true
 
-      - name: Validate Mihomo classical conversion
+      - name: Validate Mihomo domain conversion
         run: |
-          cat <<'EOF' > validate_mihomo_classical.py
+          cat <<'EOF' > validate_mihomo_domain.py
           import subprocess
           from pathlib import Path
 
-          sample_yaml = Path('mihomo-classical-smoke.yaml')
-          sample_mrs = Path('mihomo-classical-smoke.mrs')
+          sample_yaml = Path('mihomo-domain-smoke.yaml')
+          sample_mrs = Path('mihomo-domain-smoke.mrs')
           sample_yaml.write_text('payload:\n  - DOMAIN-SUFFIX,example.com\n', encoding='utf-8')
 
           try:
               result = subprocess.run(
-                  ['./mihomo', 'convert-ruleset', 'classical', 'yaml', str(sample_yaml), str(sample_mrs)],
+                  ['./mihomo', 'convert-ruleset', 'domain', 'yaml', str(sample_yaml), str(sample_mrs)],
                   capture_output=True,
                   text=True,
               )
               if result.returncode != 0 or not sample_mrs.exists() or sample_mrs.stat().st_size == 0:
-                  print('Mihomo classical conversion is unavailable in this release; skipping .mrs generation for this run.')
+                  print('Mihomo domain conversion is unavailable in this release; skipping .mrs generation for this run.')
                   print((result.stderr or result.stdout or '').strip())
-                  Path('mihomo_classical_available.txt').write_text('0\n', encoding='utf-8')
+                  Path('mihomo_domain_available.txt').write_text('0\n', encoding='utf-8')
               else:
-                  Path('mihomo_classical_available.txt').write_text('1\n', encoding='utf-8')
+                  Path('mihomo_domain_available.txt').write_text('1\n', encoding='utf-8')
           finally:
               if sample_yaml.exists():
                   sample_yaml.unlink()
@@ -60,7 +60,7 @@ jobs:
                   sample_mrs.unlink()
           EOF
 
-          python3 validate_mihomo_classical.py
+          python3 validate_mihomo_domain.py
 
       - name: Collect all rule files
         run: |
@@ -124,7 +124,7 @@ jobs:
           import yaml
 
           changes = json.loads(Path('changed_rules.json').read_text(encoding='utf-8'))
-          mihomo_classical_available = Path('mihomo_classical_available.txt').read_text(encoding='utf-8').strip() == '1'
+          mihomo_domain_available = Path('mihomo_domain_available.txt').read_text(encoding='utf-8').strip() == '1'
 
           def build_yaml_payload(path: Path, rules: list[str], suffix: str) -> Path:
               tmp_yaml = path.with_suffix(suffix)
@@ -147,40 +147,28 @@ jobs:
                   return None
               return rule_type, parts[1], parts[2:]
 
-          def normalize_rule(rule: str) -> tuple[str | None, str | None]:
+          def normalize_domain_rule(rule: str) -> tuple[str | None, str | None]:
               parsed = parse_rule(rule)
               if parsed is None:
                   return None, 'non-string or malformed rule'
 
               rule_type, target, options = parsed
-              if rule_type == 'MATCH':
-                  return 'MATCH', None
-
-              allowed_option_sets = {
-                  'DOMAIN': {()},
-                  'DOMAIN-SUFFIX': {()},
-                  'DOMAIN-KEYWORD': {()},
-                  'IP-CIDR': {(), ('no-resolve',)},
-                  'IP-CIDR6': {(), ('no-resolve',)},
-              }
-
-              if rule_type not in allowed_option_sets:
-                  return None, 'unsupported rule type for conservative MRS conversion'
+              if rule_type not in {'DOMAIN', 'DOMAIN-SUFFIX', 'DOMAIN-KEYWORD'}:
+                  return None, 'unsupported rule type for domain MRS conversion'
 
               normalized_options = tuple(option for option in options if option)
-              if normalized_options not in allowed_option_sets[rule_type]:
-                  return None, 'unsupported rule options for conservative MRS conversion'
+              if normalized_options:
+                  return None, 'unsupported rule options for domain MRS conversion'
 
-              normalized = ','.join([rule_type, target, *normalized_options]) if normalized_options else f'{rule_type},{target}'
-              return normalized, None
+              return f'{rule_type},{target}', None
 
-          def collect_normalized_rules(path: Path, payload: list[object]) -> tuple[list[str], list[tuple[int, str, str]]]:
+          def collect_normalized_domain_rules(path: Path, payload: list[object]) -> tuple[list[str], list[tuple[int, str, str]]]:
               normalized_rules: list[str] = []
               skipped_rules: list[tuple[int, str, str]] = []
 
               for idx, item in enumerate(payload, start=1):
                   display_value = item if isinstance(item, str) else repr(item)
-                  normalized_rule, reason = normalize_rule(item) if isinstance(item, str) else (None, 'non-string rule')
+                  normalized_rule, reason = normalize_domain_rule(item) if isinstance(item, str) else (None, 'non-string rule')
                   if normalized_rule is not None:
                       normalized_rules.append(normalized_rule)
                   else:
@@ -188,13 +176,13 @@ jobs:
 
               return normalized_rules, skipped_rules
 
-          def load_normalized_yaml(path: Path) -> tuple[Path | None, list[str], list[tuple[int, str, str]]]:
+          def load_normalized_domain_yaml(path: Path) -> tuple[Path | None, list[str], list[tuple[int, str, str]]]:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
               payload = data.get('payload') if isinstance(data, dict) else None
               if not isinstance(payload, list):
                   raise ValueError(f'Invalid payload in {path.as_posix()}')
 
-              normalized_rules, skipped_rules = collect_normalized_rules(path, payload)
+              normalized_rules, skipped_rules = collect_normalized_domain_rules(path, payload)
 
               if skipped_rules:
                   skipped_rules.sort(key=lambda item: item[0])
@@ -203,14 +191,14 @@ jobs:
                       print(f'  line #{idx}: {rule} -- {reason}')
 
               if not normalized_rules:
-                  print(f'Skip YAML with no conservative MRS-safe rules: {path.as_posix()}')
+                  print(f'Skip YAML with no domain MRS-safe rules: {path.as_posix()}')
                   return None, [], skipped_rules
 
               return build_yaml_payload(path, normalized_rules, '.sanitized.yaml'), normalized_rules, skipped_rules
 
           def run_mihomo_convert(source_path: Path, output_path: Path) -> subprocess.CompletedProcess[str]:
               return subprocess.run([
-                  './mihomo', 'convert-ruleset', 'classical', 'yaml', str(source_path), str(output_path)
+                  './mihomo', 'convert-ruleset', 'domain', 'yaml', str(source_path), str(output_path)
               ], capture_output=True, text=True)
 
           def remove_invalid_mrs(path: Path) -> None:
@@ -233,14 +221,14 @@ jobs:
                   print(f'Skip missing source: {path.as_posix()}')
                   continue
 
-              if not mihomo_classical_available:
+              if not mihomo_domain_available:
                   remove_invalid_mrs(mrs_path)
-                  print(f'Skip MRS conversion because Mihomo classical conversion is unavailable: {path.as_posix()}')
+                  print(f'Skip MRS conversion because Mihomo domain conversion is unavailable: {path.as_posix()}')
                   continue
 
               try:
                   if suffix in ('.yaml', '.yml'):
-                      sanitized_yaml, normalized_rules, _ = load_normalized_yaml(path)
+                      sanitized_yaml, normalized_rules, _ = load_normalized_domain_yaml(path)
                       if sanitized_yaml is None:
                           remove_invalid_mrs(mrs_path)
                           continue
@@ -250,13 +238,13 @@ jobs:
                           if result.returncode == 0:
                               remove_invalid_mrs(mrs_path)
                               if mrs_path.exists():
-                                  print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} normalized rules)')
+                                  print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} domain rules)')
                               else:
                                   print(f'Failed YAML: {path.as_posix()}')
                                   print('Generated empty .mrs file and removed it')
                           else:
                               remove_invalid_mrs(mrs_path)
-                              print(f'Failed YAML after conservative normalization: {path.as_posix()}')
+                              print(f'Failed YAML after domain normalization: {path.as_posix()}')
                               print((result.stderr or result.stdout or '').strip())
                       finally:
                           if sanitized_yaml.exists():
@@ -266,23 +254,23 @@ jobs:
                       try:
                           subprocess.run(['python3', 'convert_txt_rules.py', str(path), str(tmp_yaml)], check=True)
                           if tmp_yaml.exists() and tmp_yaml.stat().st_size > 0:
-                              sanitized_yaml, normalized_rules, _ = load_normalized_yaml(tmp_yaml)
+                              sanitized_yaml, normalized_rules, _ = load_normalized_domain_yaml(tmp_yaml)
                               if sanitized_yaml is None:
                                   remove_invalid_mrs(mrs_path)
-                                  print(f'Skip TXT with no conservative MRS-safe rules: {path.as_posix()}')
+                                  print(f'Skip TXT with no domain MRS-safe rules: {path.as_posix()}')
                                   continue
                               try:
                                   result = run_mihomo_convert(sanitized_yaml, mrs_path)
                                   if result.returncode == 0:
                                       remove_invalid_mrs(mrs_path)
                                       if mrs_path.exists():
-                                          print(f'Converted TXT: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} normalized rules)')
+                                          print(f'Converted TXT: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} domain rules)')
                                       else:
                                           print(f'Failed TXT: {path.as_posix()}')
                                           print('Generated empty .mrs file and removed it')
                                   else:
                                       remove_invalid_mrs(mrs_path)
-                                      print(f'Failed TXT after conservative normalization: {path.as_posix()}')
+                                      print(f'Failed TXT after domain normalization: {path.as_posix()}')
                                       print((result.stderr or result.stdout or '').strip())
                               finally:
                                   if sanitized_yaml.exists():
