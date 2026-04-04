@@ -20,4 +20,4 @@ payload:
   - PROCESS-NAME,WebTorrent
   - PROCESS-NAME,zerotier-one
   - PROCESS-NAME,easytier-core
-  - PROCESS-NAME,rustdesk
+  - PROCESS-NAME,vnt
