@@ -52,11 +52,11 @@ jobs:
 
           def is_rule_file(path: str) -> bool:
               p = Path(path)
-              return p.parts and p.parts[0] == 'rules' and p.suffix.lower() in exts and p.stem != 'DirectProcess'
+              return p.parts and p.parts[0] == 'rules' and p.suffix.lower() in exts
 
           if event_name == 'workflow_dispatch' or not before or set(before) == {'0'}:
               for path in sorted(Path('rules').rglob('*')):
-                  if path.is_file() and path.suffix.lower() in exts:
+                  if path.is_file() and is_rule_file(path.as_posix()):
                       changes.append({'status': 'A', 'path': path.as_posix()})
           else:
               result = subprocess.run(
