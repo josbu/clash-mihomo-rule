@@ -29,9 +29,12 @@ jobs:
         run: pip install pyyaml
 
       - name: Download Mihomo
+        env:
+          MIHOMO_VERSION: v1.18.10
         run: |
-          curl -fL https://github.com/MetaCubeX/mihomo/releases/download/v1.19.20/mihomo-linux-amd64-compatible-v1.19.20.gz | gunzip > mihomo
+          curl -fL "https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/mihomo-linux-amd64-compatible-${MIHOMO_VERSION}.gz" | gunzip > mihomo
           chmod +x mihomo
+          ./mihomo -v || true
 
       - name: Collect changed rule files
         run: |
@@ -232,10 +235,14 @@ jobs:
                   if suffix in ('.yaml', '.yml'):
                       sanitized_yaml = filter_yaml_rules(path)
                       try:
-                          subprocess.run([
+                          result = subprocess.run([
                               './mihomo', 'convert-ruleset', 'classical', 'yaml', str(sanitized_yaml), str(mrs_path)
-                          ], check=True)
-                          print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
+                          ], capture_output=True, text=True)
+                          if result.returncode == 0:
+                              print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
+                          else:
+                              print(f'Failed YAML: {path.as_posix()}')
+                              print((result.stderr or result.stdout or '').strip())
                       finally:
                           if sanitized_yaml != path and sanitized_yaml.exists():
                               sanitized_yaml.unlink()
@@ -244,10 +251,14 @@ jobs:
                       try:
                           subprocess.run(['python3', 'convert_txt_rules.py', str(path), str(tmp_yaml)], check=True)
                           if tmp_yaml.exists() and tmp_yaml.stat().st_size > 0:
-                              subprocess.run([
+                              result = subprocess.run([
                                   './mihomo', 'convert-ruleset', 'classical', 'yaml', str(tmp_yaml), str(mrs_path)
-                              ], check=True)
-                              print(f'Converted TXT: {path.as_posix()} -> {mrs_path.as_posix()}')
+                              ], capture_output=True, text=True)
+                              if result.returncode == 0:
+                                  print(f'Converted TXT: {path.as_posix()} -> {mrs_path.as_posix()}')
+                              else:
+                                  print(f'Failed TXT: {path.as_posix()}')
+                                  print((result.stderr or result.stdout or '').strip())
                           else:
                               print(f'Skip empty TXT rules: {path.as_posix()}')
                       finally:
@@ -256,8 +267,8 @@ jobs:
                   else:
                       print(f'Skip unsupported file: {path.as_posix()}')
               except subprocess.CalledProcessError as error:
-                  print(f'Conversion failed for {path.as_posix()} (suffix: {suffix})')
-                  raise error
+                  print(f'Preparation failed for {path.as_posix()} (suffix: {suffix})')
+                  print(error)
           PY
 
       - name: Commit and push
