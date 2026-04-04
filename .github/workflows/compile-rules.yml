@@ -176,6 +176,20 @@ jobs:
 
               return normalized_rules, skipped_rules
 
+          def summarize_skipped_rules(skipped_rules: list[tuple[int, str, str]]) -> dict[str, int]:
+              summary: dict[str, int] = {}
+              for _, _, reason in skipped_rules:
+                  summary[reason] = summary.get(reason, 0) + 1
+              return dict(sorted(summary.items()))
+
+          def print_skip_summary(path: Path, skipped_rules: list[tuple[int, str, str]]) -> None:
+              if not skipped_rules:
+                  return
+              summary = summarize_skipped_rules(skipped_rules)
+              print(f'Unsupported rule summary for {path.as_posix()}:')
+              for reason, count in summary.items():
+                  print(f'  - {count} rule(s): {reason}')
+
           def load_normalized_domain_yaml(path: Path) -> tuple[Path | None, list[str], list[tuple[int, str, str]]]:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
               payload = data.get('payload') if isinstance(data, dict) else None
@@ -186,14 +200,25 @@ jobs:
 
               if skipped_rules:
                   skipped_rules.sort(key=lambda item: item[0])
-                  print(f'Skipped {len(skipped_rules)} rules in {path.as_posix()}:')
-                  for idx, rule, reason in skipped_rules:
-                      print(f'  line #{idx}: {rule} -- {reason}')
+                  print_skip_summary(path, skipped_rules)
+                  if len(skipped_rules) <= 20:
+                      print(f'Detailed skipped rules for {path.as_posix()}:')
+                      for idx, rule, reason in skipped_rules:
+                          print(f'  line #{idx}: {rule} -- {reason}')
+                  else:
+                      print(f'Detailed skipped rules for {path.as_posix()} (showing first 20 of {len(skipped_rules)}):')
+                      for idx, rule, reason in skipped_rules[:20]:
+                          print(f'  line #{idx}: {rule} -- {reason}')
 
               if not normalized_rules:
-                  print(f'Skip YAML with no domain MRS-safe rules: {path.as_posix()}')
+                  print(f'Skipped {path.as_posix()}: no domain MRS-safe rules remained after filtering')
                   return None, [], skipped_rules
 
+              print(
+                  f'Prepared {path.as_posix()}: '
+                  f'{len(normalized_rules)} domain rule(s) will be converted, '
+                  f'{len(skipped_rules)} unsupported rule(s) skipped'
+              )
               return build_yaml_payload(path, normalized_rules, '.sanitized.yaml'), normalized_rules, skipped_rules
 
           def run_mihomo_convert(source_path: Path, output_path: Path) -> subprocess.CompletedProcess[str]:
@@ -238,13 +263,13 @@ jobs:
                           if result.returncode == 0:
                               remove_invalid_mrs(mrs_path)
                               if mrs_path.exists():
-                                  print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} domain rules)')
+                                  print(f'Converted YAML successfully: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} domain rules)')
                               else:
                                   print(f'Failed YAML: {path.as_posix()}')
                                   print('Generated empty .mrs file and removed it')
                           else:
                               remove_invalid_mrs(mrs_path)
-                              print(f'Failed YAML after domain normalization: {path.as_posix()}')
+                              print(f'Failed YAML conversion after domain normalization: {path.as_posix()}')
                               print((result.stderr or result.stdout or '').strip())
                       finally:
                           if sanitized_yaml.exists():
@@ -257,7 +282,7 @@ jobs:
                               sanitized_yaml, normalized_rules, _ = load_normalized_domain_yaml(tmp_yaml)
                               if sanitized_yaml is None:
                                   remove_invalid_mrs(mrs_path)
-                                  print(f'Skip TXT with no domain MRS-safe rules: {path.as_posix()}')
+                                  print(f'Skipped TXT {path.as_posix()}: no domain MRS-safe rules remained after filtering')
                                   continue
                               try:
                                   result = run_mihomo_convert(sanitized_yaml, mrs_path)
