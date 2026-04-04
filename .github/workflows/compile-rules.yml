@@ -195,22 +195,8 @@ jobs:
               if not skipped_rules:
                   return
               summary = summarize_skipped_rules(skipped_rules)
-              print(f'Unsupported rule summary for {path.as_posix()}:')
-              for reason, count in summary.items():
-                  print(f'  - {count} rule(s): {reason}')
-
-          def print_detailed_skips(path: Path, skipped_rules: list[tuple[int, str, str]]) -> None:
-              if not skipped_rules:
-                  return
-              skipped_rules.sort(key=lambda item: item[0])
-              if len(skipped_rules) <= 20:
-                  print(f'Detailed skipped rules for {path.as_posix()}:')
-                  for idx, rule, reason in skipped_rules:
-                      print(f'  line #{idx}: {rule} -- {reason}')
-              else:
-                  print(f'Detailed skipped rules for {path.as_posix()} (showing first 20 of {len(skipped_rules)}):')
-                  for idx, rule, reason in skipped_rules[:20]:
-                      print(f'  line #{idx}: {rule} -- {reason}')
+              summary_text = '; '.join(f'{reason}: {count}' for reason, count in summary.items())
+              print(f'Skipped unsupported rules in {path.as_posix()}: {summary_text}')
 
           def load_supported_yaml(path: Path) -> tuple[str | None, Path | None, list[str], list[tuple[int, str, str]]]:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
@@ -230,7 +216,6 @@ jobs:
                       skipped_rules.append((idx, display_value, reason or 'unsupported rule'))
 
               print_skip_summary(path, skipped_rules)
-              print_detailed_skips(path, skipped_rules)
 
               present_families = [family for family, rules in kept_by_family.items() if rules]
               if not present_families:
