@@ -215,17 +215,19 @@ jobs:
                   else:
                       skipped_rules.append((idx, display_value, reason or 'unsupported rule'))
 
+              if kept_by_family['domain'] and kept_by_family['ipcidr']:
+                  skipped_rules.extend(
+                      (0, rule, 'ipcidr entries skipped during domain MRS conversion')
+                      for rule in kept_by_family['ipcidr']
+                  )
+                  kept_by_family['ipcidr'] = []
+
               print_skip_summary(path, skipped_rules)
 
               present_families = [family for family, rules in kept_by_family.items() if rules]
               if not present_families:
                   print(f'Skipped {path.as_posix()}: no supported MRS rules remained after filtering')
                   return None, None, [], skipped_rules
-
-              if len(present_families) > 1:
-                  family_counts = ', '.join(f'{family}={len(kept_by_family[family])}' for family in present_families)
-                  print(f'Skipped {path.as_posix()}: file mixes rule families and cannot be converted to a single .mrs ({family_counts})')
-                  return 'mixed', None, [], skipped_rules
 
               family = present_families[0]
               normalized_rules = kept_by_family[family]
