@@ -8,7 +8,7 @@ payload:
   - DOMAIN-SUFFIX,istoreos.com
   - DOMAIN-SUFFIX,oplist.org
   - DOMAIN-SUFFIX,bing.com
-  - DOMAIN-SUFFIX,wpurl.cc
+  - DOMAIN-SUFFIX,wpurl.c
 
 
   # 域名关键字匹配
