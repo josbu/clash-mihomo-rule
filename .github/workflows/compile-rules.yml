@@ -286,6 +286,11 @@ jobs:
                           remove_invalid_mrs(mrs_path)
                           continue
 
+                      if mode == 'ipcidr':
+                          remove_invalid_mrs(mrs_path)
+                          print(f'Skip {path.as_posix()}: Mihomo Linux ipcidr conversion is unavailable in CI')
+                          continue
+
                       if not is_mode_available(mode):
                           remove_invalid_mrs(mrs_path)
                           print(f'Skip {path.as_posix()}: Mihomo {mode} conversion is unavailable')
@@ -320,6 +325,10 @@ jobs:
                               if mode == 'mixed':
                                   remove_invalid_mrs(mrs_path)
                                   print(f'Skipped TXT {path.as_posix()}: mixed rule families are not converted to a single .mrs')
+                                  continue
+                              if mode == 'ipcidr':
+                                  remove_invalid_mrs(mrs_path)
+                                  print(f'Skip TXT {path.as_posix()}: Mihomo Linux ipcidr conversion is unavailable in CI')
                                   continue
                               if not is_mode_available(mode):
                                   remove_invalid_mrs(mrs_path)
@@ -359,6 +368,8 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           find rules -name "*.mrs" -type f -size 0 -delete
+          find rules -name "*.sanitized.yaml" -type f -delete
+          find rules -name "*.tmp-convert.yaml" -type f -delete
           git add -A rules
 
           if git diff --staged --quiet; then
