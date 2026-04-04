@@ -102,58 +102,79 @@ jobs:
               )
               return tmp_yaml
 
-          def filter_yaml_rules(path: Path) -> tuple[Path | None, list[str], list[tuple[int, str, str]]]:
+          def parse_rule(rule: str) -> tuple[str, str, list[str]] | None:
+              if not isinstance(rule, str):
+                  return None
+              parts = [part.strip() for part in rule.split(',')]
+              if not parts:
+                  return None
+              rule_type = parts[0]
+              if rule_type == 'MATCH':
+                  return 'MATCH', '', []
+              if len(parts) < 2 or not parts[1]:
+                  return None
+              return rule_type, parts[1], parts[2:]
+
+          def normalize_rule(rule: str) -> tuple[str | None, str | None]:
+              parsed = parse_rule(rule)
+              if parsed is None:
+                  return None, 'non-string or malformed rule'
+
+              rule_type, target, options = parsed
+              if rule_type == 'MATCH':
+                  return 'MATCH', None
+
+              allowed_option_sets = {
+                  'DOMAIN': {()},
+                  'DOMAIN-SUFFIX': {()},
+                  'DOMAIN-KEYWORD': {()},
+                  'IP-CIDR': {(), ('no-resolve',)},
+                  'IP-CIDR6': {(), ('no-resolve',)},
+              }
+
+              if rule_type not in allowed_option_sets:
+                  return None, 'unsupported rule type for conservative MRS conversion'
+
+              normalized_options = tuple(option for option in options if option)
+              if normalized_options not in allowed_option_sets[rule_type]:
+                  return None, 'unsupported rule options for conservative MRS conversion'
+
+              normalized = ','.join([rule_type, target, *normalized_options]) if normalized_options else f'{rule_type},{target}'
+              return normalized, None
+
+          def collect_normalized_rules(path: Path, payload: list[object]) -> tuple[list[str], list[tuple[int, str, str]]]:
+              normalized_rules: list[str] = []
+              skipped_rules: list[tuple[int, str, str]] = []
+
+              for idx, item in enumerate(payload, start=1):
+                  display_value = item if isinstance(item, str) else repr(item)
+                  normalized_rule, reason = normalize_rule(item) if isinstance(item, str) else (None, 'non-string rule')
+                  if normalized_rule is not None:
+                      normalized_rules.append(normalized_rule)
+                  else:
+                      skipped_rules.append((idx, display_value, reason or 'unsupported rule'))
+
+              return normalized_rules, skipped_rules
+
+          def load_normalized_yaml(path: Path) -> tuple[Path | None, list[str], list[tuple[int, str, str]]]:
               data = yaml.safe_load(path.read_text(encoding='utf-8'))
               payload = data.get('payload') if isinstance(data, dict) else None
               if not isinstance(payload, list):
                   raise ValueError(f'Invalid payload in {path.as_posix()}')
 
-              safe_prefixes = {
-                  'DOMAIN,',
-                  'DOMAIN-SUFFIX,',
-                  'DOMAIN-KEYWORD,',
-                  'DOMAIN-REGEX,',
-                  'IP-CIDR,',
-                  'IP-CIDR6,',
-                  'IP-ASN,',
-                  'SRC-IP-CIDR,',
-                  'SRC-IP-ASN,',
-                  'GEOIP,',
-                  'MATCH',
-              }
-
-              valid_rules = []
-              skipped_rules = []
-
-              for idx, rule in enumerate(payload, start=1):
-                  if not isinstance(rule, str):
-                      skipped_rules.append((idx, repr(rule), 'non-string rule'))
-                      continue
-
-                  if rule == 'MATCH':
-                      valid_rules.append(rule)
-                      continue
-
-                  if any(rule.startswith(prefix) for prefix in safe_prefixes if prefix != 'MATCH'):
-                      valid_rules.append(rule)
-                      continue
-
-                  skipped_rules.append((idx, rule, 'unsupported rule type for MRS conversion'))
+              normalized_rules, skipped_rules = collect_normalized_rules(path, payload)
 
               if skipped_rules:
                   skipped_rules.sort(key=lambda item: item[0])
-                  print(f'Skipped {len(skipped_rules)} unsupported rules in {path.as_posix()}:')
+                  print(f'Skipped {len(skipped_rules)} rules in {path.as_posix()}:')
                   for idx, rule, reason in skipped_rules:
                       print(f'  line #{idx}: {rule} -- {reason}')
 
-              if not valid_rules:
-                  print(f'Skip YAML with no supported rules: {path.as_posix()}')
+              if not normalized_rules:
+                  print(f'Skip YAML with no conservative MRS-safe rules: {path.as_posix()}')
                   return None, [], skipped_rules
 
-              if len(valid_rules) == len(payload):
-                  return path, valid_rules, skipped_rules
-
-              return build_yaml_payload(path, valid_rules, '.sanitized.yaml'), valid_rules, skipped_rules
+              return build_yaml_payload(path, normalized_rules, '.sanitized.yaml'), normalized_rules, skipped_rules
 
           def run_mihomo_convert(source_path: Path, output_path: Path) -> subprocess.CompletedProcess[str]:
               return subprocess.run([
@@ -163,69 +184,6 @@ jobs:
           def remove_invalid_mrs(path: Path) -> None:
               if path.exists() and path.stat().st_size == 0:
                   path.unlink()
-
-          def split_rule_options(rule: str) -> tuple[str, list[str]]:
-              parts = [part.strip() for part in rule.split(',')]
-              rule_type = parts[0] if parts else ''
-              if rule_type == 'MATCH':
-                  return 'MATCH', []
-              if len(parts) < 2:
-                  return rule, []
-              target = ','.join(parts[:2])
-              options = parts[2:]
-              return target, options
-
-          def build_rule_variants(rule: str) -> list[str]:
-              target, options = split_rule_options(rule)
-              if target == 'MATCH':
-                  return ['MATCH']
-              if not options:
-                  return [target]
-
-              variants = [target]
-              if 'no-resolve' in options:
-                  variants.append(','.join([target, 'no-resolve']))
-              return variants
-
-          def pick_convertible_rule(path: Path, rule: str) -> str | None:
-              for variant in build_rule_variants(rule):
-                  if can_convert_rules(path, [variant]):
-                      return variant
-              return None
-
-          def can_convert_rules(path: Path, rules: list[str]) -> bool:
-              if not rules:
-                  return False
-
-              with tempfile.TemporaryDirectory() as tmpdir:
-                  tmpdir_path = Path(tmpdir)
-                  probe_yaml = tmpdir_path / f'{path.stem}.probe.yaml'
-                  probe_yaml.write_text(
-                      'payload:\n' + ''.join(f'  - {rule}\n' for rule in rules),
-                      encoding='utf-8'
-                  )
-                  probe_mrs = tmpdir_path / f'{path.stem}.probe.mrs'
-                  result = run_mihomo_convert(probe_yaml, probe_mrs)
-                  remove_invalid_mrs(probe_mrs)
-                  return result.returncode == 0
-
-          def collect_safe_rules(path: Path, rules: list[str]) -> list[str]:
-              safe_rules: list[str] = []
-              excluded_rules: list[str] = []
-
-              for rule in rules:
-                  convertible_rule = pick_convertible_rule(path, rule)
-                  if convertible_rule is not None:
-                      safe_rules.append(convertible_rule)
-                  else:
-                      excluded_rules.append(rule)
-
-              if excluded_rules:
-                  print(f'Excluded {len(excluded_rules)} crashing rules in {path.as_posix()} after probing:')
-                  for rule in excluded_rules:
-                      print(f'  - {rule}')
-
-              return safe_rules
 
           for change in changes:
               path = Path(change['path'])
@@ -245,59 +203,53 @@ jobs:
 
               try:
                   if suffix in ('.yaml', '.yml'):
-                      sanitized_yaml, valid_rules, _ = filter_yaml_rules(path)
+                      sanitized_yaml, normalized_rules, _ = load_normalized_yaml(path)
                       if sanitized_yaml is None:
                           remove_invalid_mrs(mrs_path)
                           continue
 
-                      final_yaml = sanitized_yaml
-                      cleanup_yaml = sanitized_yaml != path
-
                       try:
-                          result = run_mihomo_convert(final_yaml, mrs_path)
-                          if result.returncode != 0 or not mrs_path.exists() or mrs_path.stat().st_size == 0:
-                              remove_invalid_mrs(mrs_path)
-                              print(f'Initial sanitized conversion failed for {path.as_posix()}, probing smaller rule sets...')
-                              safe_rules = collect_safe_rules(path, valid_rules)
-                              if not safe_rules:
-                                  print(f'No probe subset converted for {path.as_posix()}, retrying full sanitized YAML as a fallback output.')
-                                  result = run_mihomo_convert(final_yaml, mrs_path)
-                              else:
-                                  if safe_rules != valid_rules:
-                                      if cleanup_yaml and final_yaml.exists():
-                                          final_yaml.unlink()
-                                      final_yaml = build_yaml_payload(path, safe_rules, '.sanitized.yaml')
-                                      cleanup_yaml = True
-
-                                  result = run_mihomo_convert(final_yaml, mrs_path)
-
+                          result = run_mihomo_convert(sanitized_yaml, mrs_path)
                           if result.returncode == 0:
                               remove_invalid_mrs(mrs_path)
                               if mrs_path.exists():
-                                  print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()}')
+                                  print(f'Converted YAML: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} normalized rules)')
                               else:
                                   print(f'Failed YAML: {path.as_posix()}')
                                   print('Generated empty .mrs file and removed it')
                           else:
                               remove_invalid_mrs(mrs_path)
-                              print(f'Failed YAML: {path.as_posix()}')
+                              print(f'Failed YAML after conservative normalization: {path.as_posix()}')
                               print((result.stderr or result.stdout or '').strip())
                       finally:
-                          if cleanup_yaml and final_yaml.exists():
-                              final_yaml.unlink()
+                          if sanitized_yaml.exists():
+                              sanitized_yaml.unlink()
                   elif suffix == '.txt':
                       tmp_yaml = path.with_suffix('.tmp-convert.yaml')
                       try:
                           subprocess.run(['python3', 'convert_txt_rules.py', str(path), str(tmp_yaml)], check=True)
                           if tmp_yaml.exists() and tmp_yaml.stat().st_size > 0:
-                              result = subprocess.run([
-                                  './mihomo', 'convert-ruleset', 'classical', 'yaml', str(tmp_yaml), str(mrs_path)
-                              ], capture_output=True, text=True)
-                              if result.returncode == 0:
-                                  print(f'Converted TXT: {path.as_posix()} -> {mrs_path.as_posix()}')
-                              else:
-                                  print(f'Failed TXT: {path.as_posix()}')
-                                  print((result.stderr or result.stdout or '').strip())
+                              sanitized_yaml, normalized_rules, _ = load_normalized_yaml(tmp_yaml)
+                              if sanitized_yaml is None:
+                                  remove_invalid_mrs(mrs_path)
+                                  print(f'Skip TXT with no conservative MRS-safe rules: {path.as_posix()}')
+                                  continue
+                              try:
+                                  result = run_mihomo_convert(sanitized_yaml, mrs_path)
+                                  if result.returncode == 0:
+                                      remove_invalid_mrs(mrs_path)
+                                      if mrs_path.exists():
+                                          print(f'Converted TXT: {path.as_posix()} -> {mrs_path.as_posix()} ({len(normalized_rules)} normalized rules)')
+                                      else:
+                                          print(f'Failed TXT: {path.as_posix()}')
+                                          print('Generated empty .mrs file and removed it')
+                                  else:
+                                      remove_invalid_mrs(mrs_path)
+                                      print(f'Failed TXT after conservative normalization: {path.as_posix()}')
+                                      print((result.stderr or result.stdout or '').strip())
+                              finally:
+                                  if sanitized_yaml.exists():
+                                      sanitized_yaml.unlink()
                           else:
                               print(f'Skip empty TXT rules: {path.as_posix()}')
                       finally:
