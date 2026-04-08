@@ -22,6 +22,7 @@ payload:
 - DOMAIN-SUFFIX,freecloud.ltd
 - DOMAIN-SUFFIX,windows.com
 - DOMAIN-SUFFIX,nist.gov
+- DOMAIN-SUFFIX,ice.v.ua
 - DOMAIN-SUFFIX,fuckip.me
 - DOMAIN-SUFFIX,amazon.co.jp
 - DOMAIN-SUFFIX,koofr.net
