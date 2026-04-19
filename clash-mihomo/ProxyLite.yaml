@@ -2,6 +2,8 @@ payload:
 # 域名匹配（去重版）
 - DOMAIN-SUFFIX,amazon.com
 - DOMAIN-SUFFIX,hxi.me
+- DOMAIN-SUFFIX,gunddam.dpdns.org
+- DOMAIN-SUFFIX,chy本尊.top
 - DOMAIN-SUFFIX,amazon.co.uk
 - DOMAIN-SUFFIX,elayce.com
 - DOMAIN-SUFFIX,amazon.de
@@ -26,7 +28,6 @@ payload:
 - DOMAIN-SUFFIX,ice.v.ua
 - DOMAIN-SUFFIX,fuckip.me
 - DOMAIN-SUFFIX,api.xn--chy-js0fk50c.top
-- DOMAIN-SUFFIX,gunddam.dpdns.org
 - DOMAIN-SUFFIX,amazon.co.jp
 - DOMAIN-SUFFIX,koofr.net
 - DOMAIN-SUFFIX,tiktokglobalshop.com
