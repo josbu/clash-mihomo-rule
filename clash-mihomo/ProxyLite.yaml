@@ -1,46 +1,64 @@
 payload:
-# 域名匹配（去重版）
-- DOMAIN-SUFFIX,amazon.com
-- DOMAIN-SUFFIX,hxi.me
-- DOMAIN-SUFFIX,gunddam.dpdns.org
-- DOMAIN-SUFFIX,chy本尊.top
-- DOMAIN-SUFFIX,kl.edu.kg
-- DOMAIN-SUFFIX,chy本尊.top
-- DOMAIN-SUFFIX,h-e.top
-- DOMAIN-SUFFIX,elayce.com
-- DOMAIN-SUFFIX,amazon.de
-- DOMAIN-SUFFIX,huggingface.co
-- DOMAIN-SUFFIX,viptwo.top
-- DOMAIN-SUFFIX,followme.com
-- DOMAIN-SUFFIX,followme.ceo
-- DOMAIN-SUFFIX,whatsmydns.me
-- DOMAIN-SUFFIX,onlinejobs.ph
-- DOMAIN-SUFFIX,v2rayssr.com
-- DOMAIN-SUFFIX,qichiyu.com
-- DOMAIN-SUFFIX,yugogo.xyz
-- DOMAIN-SUFFIX,docker.com
-- DOMAIN-SUFFIX,hostloc.com
-- DOMAIN-SUFFIX,nodeseek.com
-- DOMAIN-SUFFIX,temu.com
-- DOMAIN-SUFFIX,cosmotown.com
-- DOMAIN-SUFFIX,chat100.ai
-- DOMAIN-SUFFIX,freecloud.ltd
-- DOMAIN-SUFFIX,windows.com
-- DOMAIN-SUFFIX,nist.gov
-- DOMAIN-SUFFIX,ice.v.ua
-- DOMAIN-SUFFIX,fuckip.me
-- DOMAIN-SUFFIX,api.xn--chy-js0fk50c.top
-- DOMAIN-SUFFIX,amazon.co.jp
-- DOMAIN-SUFFIX,koofr.net
-- DOMAIN-SUFFIX,tiktokglobalshop.com
-- DOMAIN-SUFFIX,x10hosting.com
-- DOMAIN-SUFFIX,hdhive.online
-- DOMAIN-SUFFIX,hdhive.com
-- d1q6f0aelx0por.cloudfront.net
-- d2wy8f7a9ursnm.cloudfront.net
-- d36jcksde1wxzq.cloudfront.net
-- +.compose-spec.io
-- +.docker.com
-- +.docker.io
-- +.dockerhub.com
-- DOMAIN-SUFFIX,har01d.org
+  # 域名匹配（去重版）
+  - DOMAIN-SUFFIX,amazon.com
+  - DOMAIN-SUFFIX,hxi.me
+  - DOMAIN-SUFFIX,gunddam.dpdns.org
+  - DOMAIN-SUFFIX,chy本尊.top
+  - DOMAIN-SUFFIX,kl.edu.kg
+  - DOMAIN-SUFFIX,h-e.top
+  - DOMAIN-SUFFIX,elayce.com
+  - DOMAIN-SUFFIX,amazon.de
+  - DOMAIN-SUFFIX,huggingface.co
+  - DOMAIN-SUFFIX,viptwo.top
+  - DOMAIN-SUFFIX,followme.com
+  - DOMAIN-SUFFIX,followme.ceo
+  - DOMAIN-SUFFIX,whatsmydns.me
+  - DOMAIN-SUFFIX,onlinejobs.ph
+  - DOMAIN-SUFFIX,v2rayssr.com
+  - DOMAIN-SUFFIX,qichiyu.com
+  - DOMAIN-SUFFIX,yugogo.xyz
+  - DOMAIN-SUFFIX,docker.com
+  - DOMAIN-SUFFIX,hostloc.com
+  - DOMAIN-SUFFIX,nodeseek.com
+  - DOMAIN-SUFFIX,temu.com
+  - DOMAIN-SUFFIX,cosmotown.com
+  - DOMAIN-SUFFIX,chat100.ai
+  - DOMAIN-SUFFIX,freecloud.ltd
+  - DOMAIN-SUFFIX,windows.com
+  - DOMAIN-SUFFIX,nist.gov
+  - DOMAIN-SUFFIX,ice.v.ua
+  - DOMAIN-SUFFIX,fuckip.me
+  - DOMAIN-SUFFIX,api.xn--chy-js0fk50c.top
+  - DOMAIN-SUFFIX,amazon.co.jp
+  - DOMAIN-SUFFIX,koofr.net
+  - DOMAIN-SUFFIX,tiktokglobalshop.com
+  - DOMAIN-SUFFIX,x10hosting.com
+  - DOMAIN-SUFFIX,hdhive.online
+  - DOMAIN-SUFFIX,hdhive.com
+  - d1q6f0aelx0por.cloudfront.net
+  - d2wy8f7a9ursnm.cloudfront.net
+  - d36jcksde1wxzq.cloudfront.net
+  - +.compose-spec.io
+  - +.docker.com
+  - +.docker.io
+  - +.dockerhub.com
+  - DOMAIN-SUFFIX,har01d.org
+
+  # 股票分析新增
+  - DOMAIN-SUFFIX,query1.finance.yahoo.com
+  - DOMAIN-SUFFIX,finance.yahoo.com
+  - DOMAIN-SUFFIX,yahoo.com
+  - DOMAIN-SUFFIX,www1.hkexnews.hk
+  - DOMAIN-SUFFIX,hkexnews.hk
+  - DOMAIN-SUFFIX,duckduckgo.com
+  - DOMAIN-SUFFIX,api.coingecko.com
+  - DOMAIN-SUFFIX,coingecko.com
+  - DOMAIN-SUFFIX,api.github.com
+  - DOMAIN-SUFFIX,github.com
+  - DOMAIN-SUFFIX,githubusercontent.com
+  - DOMAIN-SUFFIX,pypi.org
+  - DOMAIN-SUFFIX,pythonhosted.org
+  - DOMAIN-SUFFIX,files.pythonhosted.org
+  - DOMAIN-SUFFIX,xueqiu.com
+  - DOMAIN-SUFFIX,stock.xueqiu.com
+  - DOMAIN-SUFFIX,aastocks.com
