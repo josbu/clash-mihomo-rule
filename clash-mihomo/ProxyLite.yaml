@@ -1,6 +1,7 @@
 payload:
   # 域名匹配（去重版）
   - DOMAIN-SUFFIX,amazon.com
+  - DOMAIN-SUFFIX,picpi.top
   - DOMAIN-SUFFIX,hxi.me
   - DOMAIN-SUFFIX,gunddam.dpdns.org
   - DOMAIN-SUFFIX,chy本尊.top
