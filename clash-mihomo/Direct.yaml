@@ -10,7 +10,7 @@ payload:
 - DOMAIN-SUFFIX,bing.com
 - DOMAIN-SUFFIX,wpurl.cc
 - DOMAIN-SUFFIX,我爱玩原神.top
-
+- DOMAIN-SUFFIX,muyuan.do
 
 # 域名关键字匹配
 - DOMAIN-KEYWORD,baidu
