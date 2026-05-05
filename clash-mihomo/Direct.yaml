@@ -11,7 +11,6 @@ payload:
 - DOMAIN-SUFFIX,wpurl.cc
 - DOMAIN-SUFFIX,我爱玩原神.top
 - DOMAIN-SUFFIX,muyuan.do
-- DOMAIN-SUFFIX,windhub.cc
 
 # 域名关键字匹配
 - DOMAIN-KEYWORD,baidu
