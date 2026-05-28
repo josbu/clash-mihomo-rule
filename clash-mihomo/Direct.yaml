@@ -15,6 +15,7 @@ payload:
 - DOMAIN-SUFFIX,muyuan.do
 - DOMAIN-SUFFIX,eastmoney.com
 - DOMAIN-SUFFIX,littlesheep.cc
+- DOMAIN-SUFFIX,ioll.pp.ua
 
 # 域名关键字匹配
 - DOMAIN-KEYWORD,baidu
