@@ -29,7 +29,6 @@ payload:
   - DOMAIN-SUFFIX,freecloud.ltd
   - DOMAIN-SUFFIX,windows.com
   - DOMAIN-SUFFIX,nist.gov
-  - DOMAIN-SUFFIX,cloudflare.com
   - DOMAIN-SUFFIX,fuckip.me
   - DOMAIN-SUFFIX,anyrouter.top
   - DOMAIN-SUFFIX,amazon.co.jp
