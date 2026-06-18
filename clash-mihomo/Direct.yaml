@@ -15,6 +15,7 @@ payload:
 - DOMAIN-SUFFIX,littlesheep.cc
 - DOMAIN-SUFFIX,ioll.pp.ua
 - DOMAIN-SUFFIX,sina.com.cn
+- DOMAIN-SUFFIX,cloudflare.com
 
 # 域名关键字匹配
 - DOMAIN-KEYWORD,baidu
