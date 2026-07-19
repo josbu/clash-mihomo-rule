@@ -3,6 +3,7 @@ payload:
   - DOMAIN-SUFFIX,amazon.com
   - DOMAIN-SUFFIX,github.com
   - DOMAIN-SUFFIX,zmoon.top
+  - DOMAIN-SUFFIX,cc.cd
   - DOMAIN-SUFFIX,infini-cloud.net
   - DOMAIN-SUFFIX,hxi.me
   - DOMAIN-SUFFIX,cloudflare.com
