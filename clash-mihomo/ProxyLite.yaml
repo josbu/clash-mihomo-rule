@@ -1,6 +1,7 @@
 payload:
   # 域名匹配（去重版）
   - DOMAIN-SUFFIX,amazon.com
+  - DOMAIN-SUFFIX,131518.xyz
   - DOMAIN-SUFFIX,github.com
   - DOMAIN-SUFFIX,zmoon.top
   - DOMAIN-SUFFIX,cc.cd
@@ -20,7 +21,6 @@ payload:
   - DOMAIN-SUFFIX,onlinejobs.ph
   - DOMAIN-SUFFIX,v2rayssr.com
   - DOMAIN-SUFFIX,qichiyu.com
-  - DOMAIN-SUFFIX,yugogo.xyz
   - DOMAIN-SUFFIX,docker.com
   - DOMAIN-SUFFIX,hostloc.com
   - DOMAIN-SUFFIX,nodeseek.com
@@ -30,7 +30,6 @@ payload:
   - DOMAIN-SUFFIX,windows.com
   - DOMAIN-SUFFIX,nist.gov
   - DOMAIN-SUFFIX,exa.ai
-  - DOMAIN-SUFFIX,fuckip.me
   - DOMAIN-SUFFIX,anyrouter.top
   - DOMAIN-SUFFIX,amazon.co.jp
   - DOMAIN-SUFFIX,koofr.net
