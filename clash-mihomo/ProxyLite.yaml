@@ -1,6 +1,5 @@
 payload:
   # 域名匹配（去重版）
-  - DOMAIN-SUFFIX,amazon.com
   - DOMAIN-SUFFIX,131518.xyz
   - DOMAIN-SUFFIX,github.com
   - DOMAIN-SUFFIX,zmoon.top
@@ -12,7 +11,6 @@ payload:
   - DOMAIN-SUFFIX,kl.edu.kg
   - DOMAIN-SUFFIX,h-e.top
   - DOMAIN-SUFFIX,elayce.com
-  - DOMAIN-SUFFIX,amazon.de
   - DOMAIN-SUFFIX,huggingface.co
   - DOMAIN-SUFFIX,viptwo.top
   - DOMAIN-SUFFIX,followme.com
