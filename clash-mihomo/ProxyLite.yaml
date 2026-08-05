@@ -8,6 +8,7 @@ payload:
   - DOMAIN-SUFFIX,hxi.me
   - DOMAIN-SUFFIX,cloudflare.com
   - DOMAIN-SUFFIX,windhub.cc
+  - DOMAIN-SUFFIX,bxacc.xyz
   - DOMAIN-SUFFIX,kl.edu.kg
   - DOMAIN-SUFFIX,h-e.top
   - DOMAIN-SUFFIX,elayce.com
@@ -22,9 +23,7 @@ payload:
   - DOMAIN-SUFFIX,docker.com
   - DOMAIN-SUFFIX,hostloc.com
   - DOMAIN-SUFFIX,nodeseek.com
-  - DOMAIN-SUFFIX,temu.com
   - DOMAIN-SUFFIX,cosmotown.com
-  - DOMAIN-SUFFIX,chat100.ai
   - DOMAIN-SUFFIX,windows.com
   - DOMAIN-SUFFIX,nist.gov
   - DOMAIN-SUFFIX,exa.ai
