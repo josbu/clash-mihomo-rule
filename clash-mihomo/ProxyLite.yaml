@@ -6,6 +6,7 @@ payload:
   - DOMAIN-SUFFIX,temucy.top
   - DOMAIN-SUFFIX,cc.cd
   - DOMAIN-SUFFIX,qzz.io
+  - DOMAIN-SUFFIX,agentrouter.org
   - DOMAIN-SUFFIX,aicloudroute.com
   - DOMAIN-SUFFIX,abrdns.com
   - DOMAIN-SUFFIX,x-api.cfd
