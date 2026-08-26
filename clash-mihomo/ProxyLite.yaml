@@ -18,6 +18,7 @@ payload:
   - DOMAIN-SUFFIX,superqiyu.org
   - DOMAIN-SUFFIX,kl.edu.kg
   - DOMAIN-SUFFIX,hcaptcha.com
+  - DOMAIN-SUFFIX,api.telegram.org
   - DOMAIN-SUFFIX,h-e.top
   - DOMAIN-SUFFIX,elayce.com
   - DOMAIN-SUFFIX,huggingface.co
