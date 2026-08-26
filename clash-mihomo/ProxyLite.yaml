@@ -16,7 +16,6 @@ payload:
   - DOMAIN-SUFFIX,cloudflare.com
   - DOMAIN-SUFFIX,windhub.cc
   - DOMAIN-SUFFIX,superqiyu.org
-  - DOMAIN-SUFFIX,kl.edu.kg
   - DOMAIN-SUFFIX,hcaptcha.com
   - DOMAIN-SUFFIX,api.telegram.org
   - DOMAIN-SUFFIX,h-e.top
@@ -25,7 +24,6 @@ payload:
   - DOMAIN-SUFFIX,followme.com
   - DOMAIN-SUFFIX,followme.ceo
   - DOMAIN-SUFFIX,whatsmydns.me
-  - DOMAIN-SUFFIX,onlinejobs.ph
   - DOMAIN-SUFFIX,docker.com
   - DOMAIN-SUFFIX,nodeseek.com
   - DOMAIN-SUFFIX,cosmotown.com
