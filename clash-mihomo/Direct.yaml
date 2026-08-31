@@ -36,6 +36,11 @@ payload:
 - IP-CIDR,114.114.114.114/32,no-resolve
 - IP-CIDR,114.114.115.115/32,no-resolve
 - IP-CIDR,183.66.27.14/32,no-resolve
+- IP-CIDR,10.0.0.0/24,DIRECT,no-resolve
+- IP-CIDR,192.168.0.0/24,DIRECT,no-resolve
+- IP-CIDR,100.64.1.0/24,DIRECT,no-resolve
+- IP-CIDR,172.16.0.0/24,DIRECT,no-resolve
+
 
 # PROCESS-NAME
 - PROCESS-NAME,aria2c
