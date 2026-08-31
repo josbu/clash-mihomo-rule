@@ -1,5 +1,6 @@
 payload:
   # 域名匹配（去重版）
+  - DOMAIN-SUFFIX,seekai.cc
   - DOMAIN-SUFFIX,131518.xyz
   - DOMAIN-SUFFIX,github.com
   - DOMAIN-SUFFIX,zmoon.top
@@ -34,7 +35,6 @@ payload:
   - DOMAIN-SUFFIX,anyrouter.top
   - DOMAIN-SUFFIX,amazon.co.jp
   - DOMAIN-SUFFIX,koofr.net
-  - DOMAIN-SUFFIX,x10hosting.com
   - DOMAIN-SUFFIX,gancaopu.com
   - DOMAIN-SUFFIX,hdhive.com
   - +.compose-spec.io
