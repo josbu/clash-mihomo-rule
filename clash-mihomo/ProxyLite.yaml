@@ -8,6 +8,7 @@ payload:
   - DOMAIN-SUFFIX,qzz.io
   - DOMAIN-SUFFIX,agentrouter.org
   - DOMAIN-SUFFIX,aicloudroute.com
+  - DOMAIN-SUFFIX,kktoken.cc
   - DOMAIN-SUFFIX,abrdns.com
   - DOMAIN-SUFFIX,vvcode.top
   - DOMAIN-SUFFIX,x-api.cfd
@@ -33,7 +34,6 @@ payload:
   - DOMAIN-SUFFIX,anyrouter.top
   - DOMAIN-SUFFIX,amazon.co.jp
   - DOMAIN-SUFFIX,koofr.net
-  - DOMAIN-SUFFIX,tiktokglobalshop.com
   - DOMAIN-SUFFIX,x10hosting.com
   - DOMAIN-SUFFIX,gancaopu.com
   - DOMAIN-SUFFIX,hdhive.com
