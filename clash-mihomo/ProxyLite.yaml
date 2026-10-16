@@ -1,7 +1,9 @@
 payload:
   # 域名匹配（去重版）
   - DOMAIN-SUFFIX,seekai.cc
-  - DOMAIN-SUFFIX,motomoto.lol  
+  - DOMAIN-SUFFIX,ai.wxctf.com
+  - DOMAIN-SUFFIX,freeapi.site
+  - DOMAIN-SUFFIX,api.lmm.best
   - DOMAIN-SUFFIX,131518.xyz
   - DOMAIN-SUFFIX,github.com
   - DOMAIN-SUFFIX,api.llm.pm
