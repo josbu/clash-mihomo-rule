@@ -1,9 +1,9 @@
 payload:
   # 域名匹配（去重版）
   - DOMAIN-SUFFIX,seekai.cc
+  - DOMAIN-SUFFIX,bearlab.ai
   - DOMAIN-SUFFIX,ai.wxctf.com
   - DOMAIN-SUFFIX,ai.hybgzs.com
-  - DOMAIN-SUFFIX,freeapi.site
   - DOMAIN-SUFFIX,api.lmm.best
   - DOMAIN-SUFFIX,131518.xyz
   - DOMAIN-SUFFIX,github.com
@@ -11,7 +11,7 @@ payload:
   - DOMAIN-SUFFIX,newapi.makelove.cloud
   - DOMAIN-SUFFIX,cc.cd
   - DOMAIN-SUFFIX,qzz.io
-  - DOMAIN-SUFFIX,www.cun.ai
+  - DOMAIN-SUFFIX,cun.ai
   - DOMAIN-SUFFIX,agentrouter.org
   - DOMAIN-SUFFIX,aicloudroute.com
   - DOMAIN-SUFFIX,dawclaudecode.com
