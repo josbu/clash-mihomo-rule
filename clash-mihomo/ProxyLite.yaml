@@ -1,6 +1,7 @@
 payload:
   # 域名匹配（去重版）
   - DOMAIN-SUFFIX,seekai.cc
+  - DOMAIN-SUFFIX,qichiyu.com
   - DOMAIN-SUFFIX,bearlab.ai
   - DOMAIN-SUFFIX,ai.wxctf.com
   - DOMAIN-SUFFIX,ai.hybgzs.com
