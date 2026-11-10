@@ -1,7 +1,6 @@
 payload:
   # 域名匹配（去重版）
   - IP-CIDR,117.55.224.110/32
-  - DOMAIN-SUFFIX,ai.wxctf.com
   - DOMAIN-SUFFIX,seekai.cc
   - DOMAIN-SUFFIX,tabitoken.com
   - DOMAIN-SUFFIX,qichiyu.com
